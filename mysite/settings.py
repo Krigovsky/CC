@@ -38,6 +38,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'cocktail_comp.apps.CocktailCompConfig',
+    'bootstrap5',  
+    'widget_tweaks', 
+    
+    
 ]
 
 MIDDLEWARE = [

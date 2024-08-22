@@ -1,12 +1,10 @@
-<!DOCTYPE html>
-<html>
-    <body>
+{% extends "template.html" %}
+{% block content %}
         {% if not couples %}
             <p>Sorry Noone is in the data base</p>
         {% else%}
             {% for couple in couples %}
-                <p>Team Name -> {{couple.team}}</p>
+                <p>Team Name -> {{couple.team}} -> {{couple.partner_names}} </p>
             {% endfor %}
         {% endif %}
-    </body>
-</html>
+{% endblock %}

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>CC</title>
+        {% load bootstrap5 %}
+        {% bootstrap_css %}
+        {% bootstrap_javascript %}
+        {% load widget_tweaks  %}
+        <style>
+          .container {
+            padding: 10px;
+          }
+        </style>
+    </head>
+
+    <body>
+        <div id="top-nav">
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+                <a class="navbar-brand" href="#">Navbar</a>
+                <div class=" navbar" id="navbarNav">
+                  <ul class="navbar-nav">
+                    <li class="nav-item active">
+                      <a class="nav-link" href="{% url 'cocktail:index' %}">Home </a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="{% url 'cocktail:registraition' %}">Register</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="{% url 'cocktail:view' %}">View Teams</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link disabled" href="#">Disabled</a>
+                    </li>
+                  </ul>
+                </div>
+              </nav>
+        </div>
+
+        <div id="content" class="container">
+            {% block content%}
+            {% endblock %}
+        </div>
+        
+
+    </body>
+</html>
