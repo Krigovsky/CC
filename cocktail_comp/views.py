@@ -6,7 +6,7 @@ from django.db.models import F
 from django.views import generic
 
 from .models import Couple
-from .forms import RegisterForm
+from .forms import RegisterForm, StartGolfGameForm
 from .utils import split_names, decode_name
 # Create your views here.
 def index (request):
@@ -36,6 +36,13 @@ def view (request):
     print("Couple -> ", couples, type(couples))
     print("Name -> ", couples[0].team)
     for couple in couples:
-        print(couple.team, '-> ', couple.partner_names, '-> ', type(couple.partner_names))
+        # print(couple.team, '-> ', couple.partner_names, '-> ', type(couple.partner_names))
         couple_name = decode_name(couple.partner_names)
     return render(request, "cocktail/view.html", { "couples" : couples})
+
+def start_golf (request):
+    print("on start of golf page")
+    template = loader.get_template("cocktail/start_golf.html")
+    form = StartGolfGameForm()
+    context = { "form" : form }
+    return HttpResponse(template.render(context, request))

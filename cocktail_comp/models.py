@@ -6,14 +6,26 @@ from django.db import models
 #     partner = models.CharField(max_length=200)
 
 class Couple (models.Model):
+    def __str__(self) -> str:
+         return self.team
     team = models.CharField(max_length=200)
     partner_names = models.CharField(max_length=200)
     golf_results = models.CharField(max_length=200, null=True)
     cocktail_results = models.CharField(max_length=200, null=True)
     past_results = models.CharField(max_length=200, null=True)
 
-# class GolfCard (models.Model):
-#     location = models.CharField(max_length=200)
-#     game_type = models.CharField(max_length=200)
-#     number_holes = models.IntegerField(max_length=200)
-#     results = models.
+class GolfGame (models.Model):
+
+    class NumHoles (models.TextChoices):
+            NINE = (9, "Nine")
+            EIGHTEEN = (18, "Eighteen")
+
+    game_type = models.CharField(max_length=200)
+    location = models.CharField(max_length=200)
+    number_holes = models.CharField(choices=NumHoles, max_length=200)
+    teams_playing = models.ForeignKey(Couple, on_delete=models.CASCADE)
+
+class GolfCard (models.Model):
+
+    team_id = models.ForeignKey(Couple, on_delete=models.CASCADE)
+    results = models.IntegerField()

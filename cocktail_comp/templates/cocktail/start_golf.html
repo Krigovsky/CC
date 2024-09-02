@@ -1,0 +1,14 @@
+
+{% extends "template.html" %}  
+
+{% block content %}
+
+    <div class="form-start">
+        <form action="/cocktail/view/" method="post">
+            {% csrf_token %}
+            {{ form }}
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+
+{% endblock %}
