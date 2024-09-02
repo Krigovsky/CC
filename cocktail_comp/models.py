@@ -1,4 +1,6 @@
 from django.db import models
+from django.utils.translation import gettext_lazy as _
+
 
 # Create your models here.
 # class User (models.Model):
@@ -16,13 +18,14 @@ class Couple (models.Model):
 
 class GolfGame (models.Model):
 
-    class NumHoles (models.TextChoices):
-            {9: "Nine",
-            18: "Eighteen"}
+    # class NumHoles (models.TextChoices):
+        
+        
+
 
     game_type = models.CharField(max_length=200)
     location = models.CharField(max_length=200)
-    number_holes = models.CharField(choices=NumHoles, max_length=200)
+    number_holes = models.CharField(max_length=200)
     teams_playing = models.ForeignKey(Couple, on_delete=models.CASCADE)
 
 class GolfCard (models.Model):

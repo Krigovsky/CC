@@ -1,6 +1,11 @@
 from django import forms
 from .models import Couple
 
+
+holes = (
+            ("9", "Nine"),
+            ("18", "Eighteen")
+        )
 class RegisterForm (forms.Form):
     def __init__ (self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -14,16 +19,10 @@ class RegisterForm (forms.Form):
 
 class StartGolfGameForm (forms.Form):
 
-    def get_team_names ():
-        couples = Couple.objects.all()
-        couple_team_names = []
-        for x in couples:
-            couple_team_names.append(x.team)
-        # pass
-        return couple_team_names
+    
 
 
     game_type = forms.CharField(label="What type of golf are we playing", max_length=50)
     location = forms.CharField(label="Where is the game beign palyed", max_length=50)
-    number_holes = forms.ChoiceField(label="How many holes are being played")
+    number_holes = forms.ChoiceField(label="How many holes are being played", choices=holes)
     teams_playing = forms.ModelChoiceField(label="Which Teams are playing", queryset=Couple.objects.all())
