@@ -17,8 +17,8 @@ class Couple (models.Model):
 class GolfGame (models.Model):
 
     class NumHoles (models.TextChoices):
-            NINE = (9, "Nine")
-            EIGHTEEN = (18, "Eighteen")
+            {9: "Nine",
+            18: "Eighteen"}
 
     game_type = models.CharField(max_length=200)
     location = models.CharField(max_length=200)
