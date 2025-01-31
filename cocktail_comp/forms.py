@@ -19,10 +19,10 @@ class RegisterForm (forms.Form):
 
 class StartGolfGameForm (forms.Form):
 
-    
-
-
     game_type = forms.CharField(label="What type of golf are we playing", max_length=50)
     location = forms.CharField(label="Where is the game beign palyed", max_length=50)
     number_holes = forms.ChoiceField(label="How many holes are being played", choices=holes)
-    teams_playing = forms.ModelChoiceField(label="Which Teams are playing", queryset=Couple.objects.all())
+    teams_playing = forms.ModelMultipleChoiceField(label="Which Teams are playing", queryset=Couple.objects.all(), widget=forms.CheckboxSelectMultiple)
+
+class UpdateScore (forms.Form):
+    score = forms.CharField(label="Testing")

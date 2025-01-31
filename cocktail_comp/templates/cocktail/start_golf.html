@@ -2,12 +2,16 @@
 {% extends "template.html" %}  
 
 {% block content %}
-
     <div class="form-start">
-        <form action="/cocktail/view/" method="post">
+        <form action="/cocktail/card/" method="post">
             {% csrf_token %}
-            {{ form }}
-            <input type="submit" value="Submit">
+            {{ form.as_p }}
+
+
+            <button type="submit" class="btn btn-success">  
+                <span class="glyphicon glyphicon-ok"></span> Start Game  
+              </button>  
+              <a href="{% url 'cocktail:golf_card' %}" class="btn btn-default">Cancel</a>  
         </form>
     </div>
 

@@ -5,9 +5,9 @@ from django.urls import reverse
 from django.db.models import F
 from django.views import generic
 
-from .models import Couple
+from .models import Couple, GolfGame, GolfCard
 from .forms import RegisterForm, StartGolfGameForm
-from .utils import split_names, decode_name
+from .utils import split_names, decode_name, start_new_game
 # Create your views here.
 def index (request):
     return render(request, "cocktail/index.html")
@@ -46,3 +46,25 @@ def start_golf (request):
     form = StartGolfGameForm()
     context = { "form" : form }
     return HttpResponse(template.render(context, request))
+
+def golf_card (request):
+    print("In golf card space")
+
+    if request.method == "POST":
+        form = StartGolfGameForm(request.POST)
+        
+        if form.is_valid():
+            print("Form is valid")
+            golf_card = start_new_game(form)
+
+    else:
+        start_golf()
+
+
+    template = loader.get_template("cocktail/game_card.html")
+    return HttpResponse(template.render({ "card" : golf_card}, request))
+
+def update_score(request):
+
+    template = loader.get_template("cocktail/update_score.html")
+    return HttpResponse(template.render())

@@ -19,16 +19,14 @@ class Couple (models.Model):
 class GolfGame (models.Model):
 
     # class NumHoles (models.TextChoices):
-        
-        
-
+    date = models.DateTimeField()
 
     game_type = models.CharField(max_length=200)
     location = models.CharField(max_length=200)
-    number_holes = models.CharField(max_length=200)
-    teams_playing = models.ForeignKey(Couple, on_delete=models.CASCADE)
+    number_holes = models.IntegerField()
+    teams_playing = models.CharField(max_length=200)
 
 class GolfCard (models.Model):
 
-    team_id = models.ForeignKey(Couple, on_delete=models.CASCADE)
-    results = models.IntegerField()
+    card = models.ForeignKey(GolfGame, on_delete=models.CASCADE, null=True)
+    results = models.CharField(max_length=200)
