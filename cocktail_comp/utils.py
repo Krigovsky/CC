@@ -8,18 +8,21 @@ def split_names(names):
 
 def decode_name(name_string):
     names = name_string.split(", ")
+    print("NAMES _> ", names)
     final = []
+
     for x in names:
         final.append(x.strip("''[]"))
 
-    return name_string
+    print("final -> ", final, type(final))
+
+    return final
 
 def start_new_game(form):
 
     teams = []
     for user in form.cleaned_data["teams_playing"]:
         teams.append(user.team)
-
     num = [0 for i in range(int(form.cleaned_data["number_holes"]))]
     card = {'#' : [i+1 for i in range(int(form.cleaned_data["number_holes"]))]}
 
@@ -43,7 +46,7 @@ def start_new_game(form):
                                            )
     
 
-    game_card = GolfCard.objects.create(card = game_session, results = card)
+    game_card = GolfCard.objects.create(card = game_session, results = card, team_count = len(teams))
     return game_card
 
     """

@@ -17,6 +17,6 @@
         
     </table>
 
-    <a href="{% url 'cocktail:update_score' %}" class="btn btn-default">Start on first Hole</a>  
+    <a href="{% url 'cocktail:update_score' id=card.id %}" class="btn btn-default">Start on first Hole</a>  
 
 {% endblock %}

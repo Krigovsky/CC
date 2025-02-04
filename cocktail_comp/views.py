@@ -4,9 +4,10 @@ from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.urls import reverse
 from django.db.models import F
 from django.views import generic
+from django.forms import formset_factory 
 
 from .models import Couple, GolfGame, GolfCard
-from .forms import RegisterForm, StartGolfGameForm
+from .forms import RegisterForm, StartGolfGameForm, UpdateScoreForm
 from .utils import split_names, decode_name, start_new_game
 # Create your views here.
 def index (request):
@@ -60,11 +61,44 @@ def golf_card (request):
     else:
         start_golf()
 
-
-    template = loader.get_template("cocktail/game_card.html")
+    template = loader.get_template("cocktail/game_card.html")   
     return HttpResponse(template.render({ "card" : golf_card}, request))
 
-def update_score(request):
+def update_score(request, id):
 
+    print("TEST WORKED")
+    #Grab the golf card based of the id passed through in the url
+    golf_card = GolfCard.objects.filter(id=id).first()
+
+    #Finishing the game once the hole limit is reached
+    if golf_card.current_hole >= golf_card.card.number_holes:
+        template = loader.get_template("cocktail/game_card.html")   
+        return HttpResponse(template.render({ "card" : golf_card}, request))
+    
+    #create dynamic form to get the score for the hole
+    form_set = formset_factory(UpdateScoreForm, extra=golf_card.team_count)
+    formset = form_set(request.POST or None)
+
+    
+
+    print('card-> ',golf_card.team_count)
+
+    if formset.is_valid(): 
+        for form in formset: 
+
+            print(form.cleaned_data)
+            print('testHole -> ', golf_card.current_hole)
+            
+    
+    
+    #update Current hole 
+    print('Hole -> ', golf_card.current_hole)
+    golf_card.current_hole += 1
+    golf_card.save()
+    print('Hole -> ', golf_card.current_hole)
+
+    teams = decode_name(golf_card.card.teams_playing)
+
+    #final steps
     template = loader.get_template("cocktail/update_score.html")
-    return HttpResponse(template.render())
+    return HttpResponse(template.render({"form":formset, "card" : golf_card, "teams" : teams}, request))

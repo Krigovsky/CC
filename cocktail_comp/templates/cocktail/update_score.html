@@ -1,6 +1,28 @@
 {% extends "template.html" %}  
 {% block content %}
 
-    <h1>Scoring</h1>
+    <h1>Scoring {{card.current_hole}}</h1>
+
+
+    <p>{{card.card.teams_playing}}</p>
+
     
+    
+    <form method="POST" enctype="multipart/form-data"> 
+        {{form.management_data}}
+        {% csrf_token %} 
+
+        {% for team in teams %}
+        <p>{{team}} </p>
+        {% endfor%}
+        {{ form.as_p }} 
+        
+        <input type="submit" value="Submit"> 
+
+    </form> 
+
+    {% for key, value in card.results.items %}
+        {{key}}
+    {% endfor %}
+
 {% endblock %}

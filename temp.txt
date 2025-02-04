@@ -1,0 +1,11 @@
+<div class="form-start">
+        <form action="/cocktail/card/" method="post">
+            <h3>Current Hole: {{card.card.current_hole}} </h3>
+            {{form.current_hole.as_hidden}}
+            <button type="submit" class="btn btn-success">  
+                <span class="glyphicon glyphicon-ok"></span> Next Hole
+              </button> 
+            
+        </form>
+    </div>
+    

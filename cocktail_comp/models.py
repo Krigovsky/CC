@@ -17,6 +17,8 @@ class Couple (models.Model):
     past_results = models.CharField(max_length=200, null=True)
 
 class GolfGame (models.Model):
+    def __str__(self):
+        return self.id
 
     # class NumHoles (models.TextChoices):
     date = models.DateTimeField()
@@ -29,4 +31,7 @@ class GolfGame (models.Model):
 class GolfCard (models.Model):
 
     card = models.ForeignKey(GolfGame, on_delete=models.CASCADE, null=True)
+    team_count = models.IntegerField()
     results = models.CharField(max_length=200)
+    
+    current_hole = models.IntegerField(default=0)

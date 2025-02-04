@@ -24,5 +24,7 @@ class StartGolfGameForm (forms.Form):
     number_holes = forms.ChoiceField(label="How many holes are being played", choices=holes)
     teams_playing = forms.ModelMultipleChoiceField(label="Which Teams are playing", queryset=Couple.objects.all(), widget=forms.CheckboxSelectMultiple)
 
-class UpdateScore (forms.Form):
+class UpdateScoreForm (forms.Form):
+
+    team = forms.CharField(max_length=50)
     score = forms.CharField(label="Testing")
