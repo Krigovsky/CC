@@ -1,14 +1,19 @@
-from django.shortcuts import render, get_object_or_404, get_list_or_404
+from django.shortcuts import render, get_object_or_404, get_list_or_404, redirect
 from django.template import loader
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.urls import reverse
 from django.db.models import F
 from django.views import generic
 from django.forms import formset_factory 
+from django.forms.models import model_to_dict
+
 
 from .models import Couple, GolfGame, GolfCard
 from .forms import RegisterForm, StartGolfGameForm, UpdateScoreForm
 from .utils import split_names, decode_name, start_new_game
+
+import ast 
+
 # Create your views here.
 def index (request):
     return render(request, "cocktail/index.html")
@@ -66,39 +71,62 @@ def golf_card (request):
 
 def update_score(request, id):
 
+
     print("TEST WORKED")
     #Grab the golf card based of the id passed through in the url
     golf_card = GolfCard.objects.filter(id=id).first()
+    
+    teams = decode_name(golf_card.card.teams_playing)
 
-    #Finishing the game once the hole limit is reached
-    if golf_card.current_hole >= golf_card.card.number_holes:
-        template = loader.get_template("cocktail/game_card.html")   
-        return HttpResponse(template.render({ "card" : golf_card}, request))
+   
+    
     
     #create dynamic form to get the score for the hole
-    form_set = formset_factory(UpdateScoreForm, extra=golf_card.team_count)
-    formset = form_set(request.POST or None)
+    card_form_set = formset_factory(UpdateScoreForm, extra=golf_card.team_count)
+    formset = card_form_set(request.POST or None)
 
-    
 
-    print('card-> ',golf_card.team_count)
+    results_dict = ast.literal_eval(golf_card.results)
 
     if formset.is_valid(): 
-        for form in formset: 
+        print("##FORM SUBMITTED##")
+        
+        count = 0
+        for form in formset:             
+            team_list = results_dict[teams[count]]
+            team_list[golf_card.current_hole - 1] = form.cleaned_data.get("score")
+            results_dict[teams[count]] = team_list
 
-            print(form.cleaned_data)
-            print('testHole -> ', golf_card.current_hole)
-            
+            count += 1               
     
+
+    golf_card.results = results_dict
     
     #update Current hole 
-    print('Hole -> ', golf_card.current_hole)
     golf_card.current_hole += 1
     golf_card.save()
-    print('Hole -> ', golf_card.current_hole)
-
-    teams = decode_name(golf_card.card.teams_playing)
+    
+    #Finishing the game once the hole limit is reached
+    if golf_card.current_hole >= golf_card.card.number_holes:
+        
+        return redirect('cocktail:score_card', id=id)
 
     #final steps
     template = loader.get_template("cocktail/update_score.html")
-    return HttpResponse(template.render({"form":formset, "card" : golf_card, "teams" : teams}, request))
+    return HttpResponse(template.render({
+                                         "formset":formset, 
+                                         "card" : golf_card, 
+                                         "test" :zip(formset, teams)
+                                         }, request))
+
+def score_card (request, id):
+    #Grab the golf card based of the id passed through in the url
+    golf_card = GolfCard.objects.filter(id=id).first()
+    print(golf_card)
+    results_dict = ast.literal_eval(golf_card.results)
+
+    template = loader.get_template("cocktail/game_card.html")   
+    return HttpResponse(template.render({ "card" : golf_card,
+                                         "results" : results_dict
+                                         }, request))
+    pass

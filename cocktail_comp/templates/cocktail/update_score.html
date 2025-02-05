@@ -9,20 +9,17 @@
     
     
     <form method="POST" enctype="multipart/form-data"> 
-        {{form.management_data}}
         {% csrf_token %} 
-
-        {% for team in teams %}
-        <p>{{team}} </p>
-        {% endfor%}
-        {{ form.as_p }} 
+        {{formset.management_form}}
+        
+        {% for form, team in test %}
+            <p>{{team}} - {{form.score}}</p>
+            
+        {% endfor %}
         
         <input type="submit" value="Submit"> 
-
     </form> 
 
-    {% for key, value in card.results.items %}
-        {{key}}
-    {% endfor %}
+    <a href="{% url 'cocktail:score_card' id=card.id %}"class="btn btn-default">View Score Card</a>
 
 {% endblock %}
