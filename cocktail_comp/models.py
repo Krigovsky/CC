@@ -10,7 +10,7 @@ from django.utils.translation import gettext_lazy as _
 class Couple (models.Model):
     def __str__(self) -> str:
          return self.team
-    team = models.CharField(max_length=200)
+    team = models.CharField(max_length=200, unique=True)
     partner_names = models.CharField(max_length=200)
     golf_results = models.CharField(max_length=200, null=True)
     cocktail_results = models.CharField(max_length=200, null=True)
@@ -35,3 +35,4 @@ class GolfCard (models.Model):
     results = models.CharField(max_length=200)
     
     current_hole = models.IntegerField(default=0)
+    score = models.CharField(max_length=200)

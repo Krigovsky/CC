@@ -15,7 +15,15 @@
         {% endfor %}
         
     </table>
-
-    <a href="{% url 'cocktail:update_score' id=card.id %}" class="btn btn-default">Continue to next Hole</a>  
-
+    {% if card.current_hole <= card.card.number_holes %}
+        {% if card.current_hole != 0 %}
+        <a href="{% url 'cocktail:update_score' id=card.id hole=card.current_hole %}" class="btn btn-default">Back to the Hole {{card.current_hole}} </a> 
+        <a href="{% url 'cocktail:update_score' id=card.id hole=card.current_hole|add:1 %}" class="btn btn-default">Continue to next Hole</a> 
+        {% else %}
+        <a href="{% url 'cocktail:update_score' id=card.id hole=card.current_hole|add:1 %}" class="btn btn-default">Start Game</a>  
+        {% endif %}
+     
+    {% else %}
+        <a href="{% url 'cocktail:view' %}" class="btn btn-default">End Game</a>          
+    {% endif %}
 {% endblock %}

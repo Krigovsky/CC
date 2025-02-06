@@ -1,4 +1,4 @@
-from .models import GolfGame, GolfCard
+from .models import GolfGame, GolfCard, Couple
 
 from datetime import datetime
 
@@ -8,13 +8,11 @@ def split_names(names):
 
 def decode_name(name_string):
     names = name_string.split(", ")
-    print("NAMES _> ", names)
     final = []
 
     for x in names:
         final.append(x.strip("''[]"))
 
-    print("final -> ", final, type(final))
 
     return final
 
@@ -23,20 +21,13 @@ def start_new_game(form):
     teams = []
     for user in form.cleaned_data["teams_playing"]:
         teams.append(user.team)
-    num = [0 for i in range(int(form.cleaned_data["number_holes"]))]
+    num = [0 for i in range(int(form.cleaned_data["number_holes"])+1)]
     card = {'#' : [i+1 for i in range(int(form.cleaned_data["number_holes"]))]}
+    card["#"].append("Total")
 
     for player in teams:
         card.update({player : num})
 
-    print(card)
-
-    # for hole in range(int(form.cleaned_data["number_holes"])):
-    #     size = []
-    #     for players in teams:
-    #         size.append(0)
-
-    #     card.update({hole+1 : size})
 
     game_session = GolfGame.objects.create(date = datetime.now(),
                                            game_type=form.cleaned_data["game_type"],
@@ -46,7 +37,10 @@ def start_new_game(form):
                                            )
     
 
-    game_card = GolfCard.objects.create(card = game_session, results = card, team_count = len(teams))
+    game_card = GolfCard.objects.create(card = game_session, 
+                                        results = card, 
+                                        team_count = len(teams),
+                                        score = [0 for i in range(len(game_session.teams_playing))])
     return game_card
 
     """
@@ -56,3 +50,11 @@ def start_new_game(form):
             team2 : [0,1,2,3,4,5,6,7,8,9]
             }
     """
+
+def get_team_members(team_name):
+    couple = Couple.objects.filter(team=team_name).first()
+    names = decode_name(couple.partner_names)
+    print(f"Couples name -> {type(names)}")
+    return names
+
+

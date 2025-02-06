@@ -25,4 +25,11 @@ class StartGolfGameForm (forms.Form):
     teams_playing = forms.ModelMultipleChoiceField(label="Which Teams are playing", queryset=Couple.objects.all(), widget=forms.CheckboxSelectMultiple)
 
 class UpdateScoreForm (forms.Form):
-    score = forms.CharField(label="Testing")
+    score = forms.CharField(label="Score", required=True)
+    driver = forms.ChoiceField(choices=[], required=True)
+
+    def __init__(self, *args, **kwargs):
+        team_members = kwargs.pop('team_members', [])
+        super().__init__(*args, **kwargs)
+
+        self.fields['driver'].choices = [(member, member) for member in team_members]

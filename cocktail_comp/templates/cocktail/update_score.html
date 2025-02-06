@@ -1,25 +1,53 @@
 {% extends "template.html" %}  
 {% block content %}
-
-    <h1>Scoring {{card.current_hole}}</h1>
-
-
-    <p>{{card.card.teams_playing}}</p>
-
-    
-    
+    <table class="table table-striped table-hover table-bordered">
+        <tr>
+            {% for hole in number_holes %}
+                {% if hole != "Total" %}
+                <td>
+                    <a class="btn btn-success" href="{% url 'cocktail:update_score' id=card.id hole=hole %}">Hole {{ hole }}</a>
+                </td>
+                {% endif %}
+            {% endfor %}
+        </tr>
+    </table>
     <form method="POST" enctype="multipart/form-data"> 
         {% csrf_token %} 
         {{formset.management_form}}
+
+        <input type="hidden" name="hole" value="{{card.current_hole|add:1}}">
         
-        {% for form, team in test %}
-            <p>{{team}} - {{form.score}}</p>
-            
-        {% endfor %}
+        <table class="table table-striped table-hover table-bordered">
+
+            <tr>
+                <td>#</td>
+                <td>Hole {{card.current_hole}}</td>
+                <td>Whos Drive?</td>
+            </tr>
+            {% for form, team in test %}
+                <tr>
+                    <td>
+                        {{team}}
+                    </td>
+
+                    <td>
+                        {{form.score}}
+                    </td>
+
+                    <td>
+                        {{form.driver}}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+        
         
         <input type="submit" value="Submit"> 
     </form> 
 
-    <a href="{% url 'cocktail:score_card' id=card.id %}"class="btn btn-default">View Score Card</a>
-
+    <a href="{% url 'cocktail:score_card' id=card.id hole=card.current_hole|add:1 %}" class="btn btn-default">View Score Card</a>
+    
+    {% if card.current_hole >= 2 %}
+    <a href="{% url 'cocktail:hole' id=card.id hole=card.current_hole|add:-1 %}" class="btn btn-default">Go back a hole</a>
+    {% endif %}    
 {% endblock %}
