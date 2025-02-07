@@ -1,6 +1,7 @@
 from .models import GolfGame, GolfCard, Couple
 
 from datetime import datetime
+import ast 
 
 def split_names(names):
     name = names.split(', ')
@@ -21,12 +22,42 @@ def start_new_game(form):
     teams = []
     for user in form.cleaned_data["teams_playing"]:
         teams.append(user.team)
+    # Set amount of holes to be used in dictionary
     num = [0 for i in range(int(form.cleaned_data["number_holes"])+1)]
+    # Inizitalise the dictionary with the base line of holes and total
     card = {'#' : [i+1 for i in range(int(form.cleaned_data["number_holes"]))]}
     card["#"].append("Total")
-
+    # Appened the teams name and start scoreing at 0
     for player in teams:
         card.update({player : num})
+
+    
+    #drivers
+    drivers = {}
+    for team in teams:
+        couple = Couple.objects.filter(team = team).first()
+        couple_names = ast.literal_eval(couple.partner_names)
+        print(couple_names, type(couple_names))
+        
+        for name in couple_names:
+            if team in drivers:
+                drivers[team].append({name : [False for i in range(int(form.cleaned_data["number_holes"]))]})
+            else:
+                drivers.update({team : [{name: [False for i in range(int(form.cleaned_data["number_holes"]))]}]})
+ 
+
+    print("drivers _> ", drivers)
+    
+    """
+    change bool value to true if driver comes back from form at the hole index
+
+    drivers = {
+               "Team1" : {player1 : [0,0,0,0,0,0,0,0,0],
+                          plater2 : [0,0,0,0,0,0,0,0,0]},
+               "Team2" : {player3 : [0,0,0,0,0,0,0,0,0],
+                          plater4 : [0,0,0,0,0,0,0,0,0]}
+              }
+    """
 
 
     game_session = GolfGame.objects.create(date = datetime.now(),
@@ -40,7 +71,8 @@ def start_new_game(form):
     game_card = GolfCard.objects.create(card = game_session, 
                                         results = card, 
                                         team_count = len(teams),
-                                        score = [0 for i in range(len(game_session.teams_playing))])
+                                        score = [0 for i in range(len(game_session.teams_playing))],
+                                        driver_count = drivers)
     return game_card
 
     """
@@ -57,4 +89,9 @@ def get_team_members(team_name):
     print(f"Couples name -> {type(names)}")
     return names
 
+def create_drive_count(drivers_dict):
+    print("Drivers Drict ->",drivers_dict)
+    for key in drivers_dict.keys():
+        print(key)
+    pass
 

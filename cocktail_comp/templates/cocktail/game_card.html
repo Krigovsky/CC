@@ -15,10 +15,28 @@
         {% endfor %}
         
     </table>
+
+    <p> {{drives}} </p>
+    {% for team in drives %}
+    <h2>{{team}}</h2>
+    <table class="table table-stripes table-hover">
+        
+            <tr>
+                <td>
+                    Person
+                </td>
+                <td>
+                    Drives
+                </td>
+            </tr>
+         
+            temp = create_drive_count(drivers)
+        
+    </table>
+    {% endfor %}
     {% if card.current_hole <= card.card.number_holes %}
         {% if card.current_hole != 0 %}
-        <a href="{% url 'cocktail:update_score' id=card.id hole=card.current_hole %}" class="btn btn-default">Back to the Hole {{card.current_hole}} </a> 
-        <a href="{% url 'cocktail:update_score' id=card.id hole=card.current_hole|add:1 %}" class="btn btn-default">Continue to next Hole</a> 
+        <a href="{% url 'cocktail:update_score' id=card.id hole=card.current_hole %}" class="btn btn-success">Back to the Hole {{card.current_hole}} </a> 
         {% else %}
         <a href="{% url 'cocktail:update_score' id=card.id hole=card.current_hole|add:1 %}" class="btn btn-default">Start Game</a>  
         {% endif %}

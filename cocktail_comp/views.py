@@ -10,7 +10,7 @@ from django.forms.models import model_to_dict
 
 from .models import Couple, GolfGame, GolfCard
 from .forms import RegisterForm, StartGolfGameForm, UpdateScoreForm
-from .utils import split_names, decode_name, start_new_game, get_team_members
+from .utils import split_names, decode_name, start_new_game, get_team_members, create_drive_count
 
 import ast 
 
@@ -86,6 +86,9 @@ def update_score(request, id, hole):
     for i, form in enumerate(formset):
         form.fields['driver'].choices = [(member, member) for member in team_members[i]]
 
+    drivers = ast.literal_eval(golf_card.driver_count)
+    print("Driver Count ->", type(drivers) )
+
     results_dict = ast.literal_eval(golf_card.results)
     # score_list = ast.literal_eval(golf_card.score)
     # print("Score list -> ", score_list, type(score_list))
@@ -94,20 +97,25 @@ def update_score(request, id, hole):
         hole = int(request.POST.get("hole"))
         print("Hole -> ", hole)
         count = 0
-        for form in formset:   
-            # score_list[count] += int(form.cleaned_data.get("score"))
-            print(results_dict)          
+        for form in formset:
+            # Updating drivers choice
+            for person in drivers[teams[count]]:
+                if form.cleaned_data.get("driver") in person:
+                    driving = person[form.cleaned_data.get("driver")]
+                    driving[golf_card.current_hole-1] = True
+
+            # Updating scores
             team_list = results_dict[teams[count]]
             team_list[golf_card.current_hole - 1] = form.cleaned_data.get("score")
             team_list[-1] += int(form.cleaned_data.get("score")) 
-            print(f"Score - > {form.cleaned_data.get("score")}")
 
             results_dict[teams[count]] = team_list
 
             count += 1        
 
-    print(results_dict)
-
+    # print(results_dict)
+    # print(drivers)
+    golf_card.driver_count = drivers
     # golf_card.score = score_list
     golf_card.results = results_dict
     
@@ -119,6 +127,7 @@ def update_score(request, id, hole):
     if golf_card.current_hole > golf_card.card.number_holes:
         
         return redirect('cocktail:score_card', id=id, hole=golf_card.current_hole)
+
 
     #final steps
     template = loader.get_template("cocktail/update_score.html")
@@ -134,10 +143,16 @@ def score_card (request, id, hole):
     golf_card = GolfCard.objects.filter(id=id).first()
     print(golf_card)
     results_dict = ast.literal_eval(golf_card.results)
+    drivers = ast.literal_eval(golf_card.driver_count)
+
+    temp = create_drive_count(drivers)
+
 
     template = loader.get_template("cocktail/game_card.html")   
     return HttpResponse(template.render({ "card" : golf_card,
-                                         "results" : results_dict
+                                         "results" : results_dict,
+                                        #  "drives" : ,
+                                        #  "persons" : ast.literal_eval(golf_card.driver_count[])
                                          }, request))
 
 
