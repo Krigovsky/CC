@@ -34,19 +34,28 @@ def start_new_game(form):
     
     #drivers
     drivers = {}
+    card_drivers = {'#' : [i+1 for i in range(int(form.cleaned_data["number_holes"]))]}
+    names = []
     for team in teams:
         couple = Couple.objects.filter(team = team).first()
         couple_names = ast.literal_eval(couple.partner_names)
-        print(couple_names, type(couple_names))
-        
+        # print(couple_names, type(couple_names))
+
+        # inner_list = []
         for name in couple_names:
+            # print(name)
+            names.append(name)
             if team in drivers:
                 drivers[team].append({name : [False for i in range(int(form.cleaned_data["number_holes"]))]})
             else:
+                card_drivers.update({team: [False for i in range(int(form.cleaned_data["number_holes"]))]})
                 drivers.update({team : [{name: [False for i in range(int(form.cleaned_data["number_holes"]))]}]})
- 
+        # names.append(inner_list)
+    powers = {
+        "mulligan" : [],
+        "milligan" : []
+    }
 
-    print("drivers _> ", drivers)
     
     """
     change bool value to true if driver comes back from form at the hole index
@@ -72,7 +81,11 @@ def start_new_game(form):
                                         results = card, 
                                         team_count = len(teams),
                                         score = [0 for i in range(len(game_session.teams_playing))],
-                                        driver_count = drivers)
+                                        driver_count = drivers,
+                                        card_driver = card_drivers,
+                                        allowed_drivers = names,
+                                        powers = powers
+                                        )
     return game_card
 
     """
@@ -89,9 +102,32 @@ def get_team_members(team_name):
     print(f"Couples name -> {type(names)}")
     return names
 
-def create_drive_count(drivers_dict):
-    print("Drivers Drict ->",drivers_dict)
+def create_drive_count(drivers_dict, card_drivers_dict, current_hole, holes):
+    # print("Drivers Drict ->",drivers_dict)
+    # print("card_driver Drict ->", card_drivers_dict)
+    # print("Number of holes -> ", current_hole)
+    over_drivers = []
     for key in drivers_dict.keys():
-        print(key)
-    pass
+        for item in drivers_dict[key]:
+            for player_key in item.keys():
+
+                for player_item in item[player_key]:
+                    if player_item == True:
+                        card_drivers_dict[key][current_hole-1] = player_key
+
+                # print("Player count -> ", card_drivers_dict[key].count(player_key))
+                if card_drivers_dict[key].count(player_key) >= int(holes/2)+1:
+                    over_drivers.append(player_key)
+            
+
+
+    return card_drivers_dict, over_drivers
+
+def get_power_texts(powers, choice):
+    print("Inside get power texts")
+    text_list = []
+    for item in powers[choice]:
+        text_list.append(item['text'])
+    return text_list
+
 

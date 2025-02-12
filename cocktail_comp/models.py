@@ -36,3 +36,8 @@ class GolfCard (models.Model):
     driver_count = models.CharField(max_length=200)
     current_hole = models.IntegerField(default=0)
     score = models.CharField(max_length=200)
+    card_driver = models.CharField(max_length=200)
+    over_drivers = models.CharField(max_length=200, default=[])
+    allowed_drivers = models.CharField(max_length=200, default=[])
+
+    powers = models.CharField(max_length=200, default={})

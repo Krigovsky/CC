@@ -11,7 +11,7 @@
             {% endfor %}
         </tr>
     </table>
-    <form method="POST" enctype="multipart/form-data"> 
+    <form method="POST" enctype="multipart/form-data" action="{% url 'cocktail:update_score' id=card.id hole=card.current_hole|add:1 %}"> 
         {% csrf_token %} 
         {{formset.management_form}}
 
@@ -23,6 +23,9 @@
                 <td>#</td>
                 <td>Hole {{card.current_hole}}</td>
                 <td>Whos Drive?</td>
+                <td>Mulligan</td>
+                
+                <td>Milligan</td>
             </tr>
             {% for form, team in test %}
                 <tr>
@@ -37,6 +40,18 @@
                     <td>
                         {{form.driver}}
                     </td>
+                    <td>
+                        <label>
+                            {{form.mulligan}}
+                        </label>
+                        
+                    </td>
+                    <td>
+                        <label>
+                            {{form.milligan}} {{form.milligan_choice}}
+                        </label>
+                        
+                    </td>
                 </tr>
             {% endfor %}
         </table>
@@ -45,9 +60,23 @@
         <input type="submit" value="Submit"> 
     </form> 
 
+
     <a href="{% url 'cocktail:score_card' id=card.id hole=card.current_hole|add:1 %}" class="btn btn-default">View Score Card</a>
     
     {% if card.current_hole >= 2 %}
     <a href="{% url 'cocktail:hole' id=card.id hole=card.current_hole|add:-1 %}" class="btn btn-default">Go back a hole</a>
     {% endif %}    
+
+    <script>
+        var hide_ids = JSON.parse('{{ hide_json|escapejs }}');
+        console.log("hide_ids:", hide_ids);
+
+        for (let i = 0; i < hide_ids.length; i++) {
+            console.log(hide_ids[i])
+            let element = document.getElementById(hide_ids[i])
+            element.classList.remove('form-check-input')
+            element.classList.add('hidden')
+            element.value = "False"
+        }
+    </script>
 {% endblock %}

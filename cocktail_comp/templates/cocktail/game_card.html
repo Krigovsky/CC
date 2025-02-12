@@ -16,24 +16,40 @@
         
     </table>
 
-    <p> {{drives}} </p>
-    {% for team in drives %}
-    <h2>{{team}}</h2>
-    <table class="table table-stripes table-hover">
-        
+    <h2>Drives</h2>
+    <table class="table table-striped table-hover">
+
+        {% for key, value in drives.items %}
             <tr>
-                <td>
-                    Person
-                </td>
-                <td>
-                    Drives
-                </td>
+                <td>{{key}}</td>
+                {% for hole in value %}
+                    <td>
+                        {{ hole}} 
+                    </td>
+                {% endfor %}
             </tr>
-         
-            temp = create_drive_count(drivers)
+        {% endfor %}
         
     </table>
-    {% endfor %}
+
+    <div>
+        <h3>Mulligans</h3>
+        <ul>
+            {% for item in mulligans %}
+                <li>{{item}}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div>
+        <h3>Milligans</h3>
+        <ul>
+            {% for item in milligans %}
+                <li>{{item}}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
     {% if card.current_hole <= card.card.number_holes %}
         {% if card.current_hole != 0 %}
         <a href="{% url 'cocktail:update_score' id=card.id hole=card.current_hole %}" class="btn btn-success">Back to the Hole {{card.current_hole}} </a> 

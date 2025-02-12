@@ -10,9 +10,10 @@ from django.forms.models import model_to_dict
 
 from .models import Couple, GolfGame, GolfCard
 from .forms import RegisterForm, StartGolfGameForm, UpdateScoreForm
-from .utils import split_names, decode_name, start_new_game, get_team_members, create_drive_count
+from .utils import split_names, decode_name, start_new_game, get_team_members, create_drive_count, get_power_texts
 
 import ast 
+import json
 
 # Create your views here.
 def index (request):
@@ -69,7 +70,7 @@ def golf_card (request):
 def update_score(request, id, hole):
 
 
-    print(f"TEST WORKED | ID = {id} | Hole = {hole}" )
+    # print(f"TEST WORKED | ID = {id} | Hole = {hole}" )
     #Grab the golf card based of the id passed through in the url
     golf_card = GolfCard.objects.filter(id=id).first()
     
@@ -77,27 +78,33 @@ def update_score(request, id, hole):
     #create dynamic form to get the score for the hole
     card_form_set = formset_factory(UpdateScoreForm, extra=golf_card.team_count)
     formset = card_form_set(request.POST or None)
+
+
     team_members = []
     for team in teams:
         team_members.append(get_team_members(team))
     
-    print("Team Members -> ", team_members)
+    not_allowed_drivers = ast.literal_eval(golf_card.over_drivers)
+    allowed_drivers = ast.literal_eval(golf_card.allowed_drivers)
+    drivers = ast.literal_eval(golf_card.driver_count)
+    results_dict = ast.literal_eval(golf_card.results)
+    card_drivers_dict = ast.literal_eval(golf_card.card_driver)
+
 
     for i, form in enumerate(formset):
-        form.fields['driver'].choices = [(member, member) for member in team_members[i]]
+        available_choices = [(member, member) for member in team_members[i] if member in allowed_drivers]
+        form.fields['driver'].choices = available_choices
 
-    drivers = ast.literal_eval(golf_card.driver_count)
-    print("Driver Count ->", type(drivers) )
-
-    results_dict = ast.literal_eval(golf_card.results)
-    # score_list = ast.literal_eval(golf_card.score)
-    # print("Score list -> ", score_list, type(score_list))
+    mulligan = []
+    milligan = []
+    powers = ast.literal_eval(golf_card.powers)
+    # print("Powers -> ", powers)
+    
     if formset.is_valid(): 
         print("##FORM SUBMITTED##")
-        hole = int(request.POST.get("hole"))
-        print("Hole -> ", hole)
         count = 0
         for form in formset:
+            print("Milligans -> ",form.cleaned_data.get("milligan"), " -> ", form.cleaned_data.get("milligan_choice"))
             # Updating drivers choice
             for person in drivers[teams[count]]:
                 if form.cleaned_data.get("driver") in person:
@@ -111,23 +118,96 @@ def update_score(request, id, hole):
 
             results_dict[teams[count]] = team_list
 
-            count += 1        
+            if form.cleaned_data.get("mulligan"):
+                mulligan.append({
+                    "team" : teams[count],
+                    "hole" : golf_card.current_hole,
+                    "text" : f"{teams[count]} - Hole {golf_card.current_hole}"
+                })
+            
+            if form.cleaned_data.get("milligan"):
+                powers["milligan"].append({
+                    "team" : teams[count],
+                    "hole" : golf_card.current_hole,
+                    "text" : f"{teams[count]} on hole {golf_card.current_hole} used the milligan on {form.cleaned_data.get("milligan_choice")}"
+                })
 
-    # print(results_dict)
-    # print(drivers)
-    golf_card.driver_count = drivers
-    # golf_card.score = score_list
-    golf_card.results = results_dict
+            count += 1 
+
     
-    #update Current hole 
+    else:
+        print("Something has gone wrong with the form") 
+        print(formset.errors)
+    
+
+    for item in mulligan:
+        if not powers["mulligan"]:
+            powers["mulligan"].append(item)
+        else:
+            for dict_item in powers["mulligan"]:
+                if item["team"] in dict_item["team"]:
+                    pass
+                else:
+                    powers["mulligan"].append(item)
+    
+    for item in milligan:
+        if not powers["milligan"]:
+            powers["milligan"].append(item)
+        else:
+            for dict_item in powers["milligan"]:
+                if item["team"] in dict_item["team"]:
+                    pass
+                else:
+                    powers["milligan"].append(item)
+
+
+    print(powers)
+        
+    driving_updates, over_drivers = create_drive_count(drivers, card_drivers_dict, golf_card.current_hole, golf_card.card.number_holes)
+    not_allowed_drivers.extend(over_drivers)
+
+    # Update the formset with the no drivers no longer able to take drives
+    for i, form in enumerate(formset):
+        available_choices = [(member, member) for member in team_members[i] if member not in not_allowed_drivers]
+        form.fields['driver'].choices = available_choices
+
+
+    golf_card.powers = powers
+    golf_card.over_drivers = not_allowed_drivers
+    golf_card.card_driver = driving_updates
+    golf_card.driver_count = drivers
+    golf_card.results = results_dict
     golf_card.current_hole = hole
     golf_card.save()
     
+    hide_fields = []
+    count = 0
+
+    for item in golf_card.powers["mulligan"]:
+        if item['team'] == teams[count]:
+            print("Items -> ", item)
+            hide_fields.append(f"id_form-{count}-mulligan")
+        count += 1
+    
+    count = 0
+    print("\nMilligans")
+    for item in golf_card.powers["milligan"]:
+        for i in range(golf_card.team_count):
+            print(item['team'], ' -> ', teams[i])
+            if item['team'] == teams[i]:
+                print("IN HERE")
+                hide_fields.append(f"id_form-{count}-milligan")
+                hide_fields.append(f"id_form-{count}-milligan_choice")
+            count += 1
+
+    print("\nHIDE FIELDS -> ", hide_fields)
+    # print("hide fields -> ", hide_fields)
+
+
     #Finishing the game once the hole limit is reached
     if golf_card.current_hole > golf_card.card.number_holes:
         
         return redirect('cocktail:score_card', id=id, hole=golf_card.current_hole)
-
 
     #final steps
     template = loader.get_template("cocktail/update_score.html")
@@ -135,24 +215,33 @@ def update_score(request, id, hole):
                                          "formset":formset, 
                                          "card" : golf_card, 
                                          "test" :zip(formset, teams),
-                                         "number_holes" : golf_card.results['#']
+                                         "number_holes" : golf_card.results['#'],
+                                         "hide_json" : json.dumps(hide_fields)
                                          }, request))
 
 def score_card (request, id, hole):
     #Grab the golf card based of the id passed through in the url
     golf_card = GolfCard.objects.filter(id=id).first()
-    print(golf_card)
     results_dict = ast.literal_eval(golf_card.results)
-    drivers = ast.literal_eval(golf_card.driver_count)
-
-    temp = create_drive_count(drivers)
-
+    
+    card_drivers_dict = ast.literal_eval(golf_card.card_driver)
+    for key in card_drivers_dict.keys():
+        
+        for index, item in enumerate(card_drivers_dict[key]):
+            if not item:
+                card_drivers_dict[key][index] = "-"
+    
+    powers = ast.literal_eval(golf_card.powers)
+    mulligans = get_power_texts(powers, "mulligan")
+    
+    milligans = get_power_texts(powers, "milligan")
 
     template = loader.get_template("cocktail/game_card.html")   
     return HttpResponse(template.render({ "card" : golf_card,
                                          "results" : results_dict,
-                                        #  "drives" : ,
-                                        #  "persons" : ast.literal_eval(golf_card.driver_count[])
+                                         "drives" : card_drivers_dict,
+                                         "mulligans" : mulligans,
+                                         "milligans" : milligans
                                          }, request))
 
 
@@ -166,3 +255,6 @@ def go_to_n_hole(request,id, hole):
     print("Currently set hole ->", golf_card.current_hole)
     return redirect('cocktail:update_score', id=id, hole=golf_card.current_hole)
 
+"""
+
+"""

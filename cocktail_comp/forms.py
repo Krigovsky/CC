@@ -25,7 +25,12 @@ class StartGolfGameForm (forms.Form):
     teams_playing = forms.ModelMultipleChoiceField(label="Which Teams are playing", queryset=Couple.objects.all(), widget=forms.CheckboxSelectMultiple)
 
 class UpdateScoreForm (forms.Form):
+    CHOICES = [
+        ('0', 'Option 0')
+    ]
+
     score = forms.CharField(label="Score", required=True)
+
     driver = forms.ChoiceField(choices=[], required=True)
 
     def __init__(self, *args, **kwargs):
@@ -33,3 +38,7 @@ class UpdateScoreForm (forms.Form):
         super().__init__(*args, **kwargs)
 
         self.fields['driver'].choices = [(member, member) for member in team_members]
+
+    mulligan = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}))
+    milligan = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}))
+    milligan_choice = forms.CharField(required=False, max_length=100)
