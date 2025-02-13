@@ -18,9 +18,12 @@ class RegisterForm (forms.Form):
     partner_names = forms.CharField(label="Names of the couple, seperated by comma", max_length=100)
 
 class StartGolfGameForm (forms.Form):
+    CHOICES = [
+        ('1', 'Normal')
+    ]
 
-    game_type = forms.CharField(label="What type of golf are we playing", max_length=50)
-    location = forms.CharField(label="Where is the game beign palyed", max_length=50)
+    game_type = forms.ChoiceField(label="What type of golf are we playing",choices=CHOICES)
+    location = forms.ChoiceField(label="Where is the game beign palyed", choices=CHOICES)
     number_holes = forms.ChoiceField(label="How many holes are being played", choices=holes)
     teams_playing = forms.ModelMultipleChoiceField(label="Which Teams are playing", queryset=Couple.objects.all(), widget=forms.CheckboxSelectMultiple)
 

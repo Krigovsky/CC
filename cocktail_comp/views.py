@@ -10,7 +10,11 @@ from django.forms.models import model_to_dict
 
 from .models import Couple, GolfGame, GolfCard
 from .forms import RegisterForm, StartGolfGameForm, UpdateScoreForm
-from .utils import split_names, decode_name, start_new_game, get_team_members, create_drive_count, get_power_texts
+
+from .utils import (split_names, decode_name, start_new_game, get_team_members, 
+                    create_drive_count, get_power_texts, powers_update, 
+                    check_previous_holes, create_hide_list, remove_duplicates,
+                    )
 
 import ast 
 import json
@@ -104,12 +108,13 @@ def update_score(request, id, hole):
         print("##FORM SUBMITTED##")
         count = 0
         for form in formset:
-            print("Milligans -> ",form.cleaned_data.get("milligan"), " -> ", form.cleaned_data.get("milligan_choice"))
+            # print("Milligans -> ",form.cleaned_data.get("milligan"), " -> ", form.cleaned_data.get("milligan_choice"))
             # Updating drivers choice
             for person in drivers[teams[count]]:
                 if form.cleaned_data.get("driver") in person:
                     driving = person[form.cleaned_data.get("driver")]
                     driving[golf_card.current_hole-1] = True
+
 
             # Updating scores
             team_list = results_dict[teams[count]]
@@ -138,31 +143,22 @@ def update_score(request, id, hole):
     else:
         print("Something has gone wrong with the form") 
         print(formset.errors)
+
+    print("Checking the scores and drivers")
+    print("Drivers -> ", drivers)
+    print("Current Hole -> ", golf_card.current_hole-1)
     
 
-    for item in mulligan:
-        if not powers["mulligan"]:
-            powers["mulligan"].append(item)
-        else:
-            for dict_item in powers["mulligan"]:
-                if item["team"] in dict_item["team"]:
-                    pass
-                else:
-                    powers["mulligan"].append(item)
-    
-    for item in milligan:
-        if not powers["milligan"]:
-            powers["milligan"].append(item)
-        else:
-            for dict_item in powers["milligan"]:
-                if item["team"] in dict_item["team"]:
-                    pass
-                else:
-                    powers["milligan"].append(item)
+    powers = powers_update(powers, mulligan, "mulligan")
+    powers = powers_update(powers, milligan, "milligan")
 
+    powers = check_previous_holes(powers, teams, hole)
+    print('\n\n')
+    remove = remove_duplicates(powers['mulligan'])
+    remove = []
+    
 
     print(powers)
-        
     driving_updates, over_drivers = create_drive_count(drivers, card_drivers_dict, golf_card.current_hole, golf_card.card.number_holes)
     not_allowed_drivers.extend(over_drivers)
 
@@ -180,29 +176,7 @@ def update_score(request, id, hole):
     golf_card.current_hole = hole
     golf_card.save()
     
-    hide_fields = []
-    count = 0
-
-    for item in golf_card.powers["mulligan"]:
-        if item['team'] == teams[count]:
-            print("Items -> ", item)
-            hide_fields.append(f"id_form-{count}-mulligan")
-        count += 1
-    
-    count = 0
-    print("\nMilligans")
-    for item in golf_card.powers["milligan"]:
-        for i in range(golf_card.team_count):
-            print(item['team'], ' -> ', teams[i])
-            if item['team'] == teams[i]:
-                print("IN HERE")
-                hide_fields.append(f"id_form-{count}-milligan")
-                hide_fields.append(f"id_form-{count}-milligan_choice")
-            count += 1
-
-    print("\nHIDE FIELDS -> ", hide_fields)
-    # print("hide fields -> ", hide_fields)
-
+    hide_fields = create_hide_list(golf_card, teams)
 
     #Finishing the game once the hole limit is reached
     if golf_card.current_hole > golf_card.card.number_holes:

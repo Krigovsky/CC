@@ -99,7 +99,7 @@ def start_new_game(form):
 def get_team_members(team_name):
     couple = Couple.objects.filter(team=team_name).first()
     names = decode_name(couple.partner_names)
-    print(f"Couples name -> {type(names)}")
+    # print(f"Couples name -> {type(names)}")
     return names
 
 def create_drive_count(drivers_dict, card_drivers_dict, current_hole, holes):
@@ -131,3 +131,84 @@ def get_power_texts(powers, choice):
     return text_list
 
 
+def powers_update(powers, updates, text):
+    for item in updates:
+        if not powers[text]:
+            powers[text].append(item)
+        else:
+            for dict_item in powers[text]:
+                if item["team"] in dict_item["team"]:
+                    pass
+                else:
+                    powers[text].append(item)
+
+    return powers 
+
+def check_previous_holes (powers, teams, hole):
+    mull_add_back_in = []
+    for index, item in enumerate(powers["mulligan"]):
+        if item["hole"] == hole:
+            for i in range(len(teams)):
+                if teams[i] == item['team']:
+                    mull_add_back_in.append(index)
+    
+    print(powers)
+    for item in reversed(mull_add_back_in):
+        powers["mulligan"].pop(item)
+
+    #MILLIGANS
+    mill_add_back_in = []
+    for index, item in enumerate(powers["milligan"]):
+        if item["hole"] == hole:
+            for i in range(len(teams)):
+                if teams[i] == item['team']:
+                    mill_add_back_in.append(index)
+    
+    for item in reversed(mill_add_back_in):
+        powers["milligan"].pop(item)
+
+    # print(powers)           
+    # print(mill_add_back_in)
+
+    return powers
+def create_hide_list (golf_card, teams):
+    hide_fields =[]
+    # print("\nMulligans")
+    for item in golf_card.powers["mulligan"]:
+        for i in range(golf_card.team_count):
+            # print(item['team'], ' -> ', teams[i])
+            if item['team'] == teams[i]:
+                # print("IN HERE")
+                hide_fields.append(f"id_form-{i}-mulligan")
+    
+    # print("\nMilligans")
+    for item in golf_card.powers["milligan"]:
+        for i in range(golf_card.team_count):
+            # print(item['team'], ' -> ', teams[i])
+            if item['team'] == teams[i]:
+                # print("IN HERE")
+                hide_fields.append(f"id_form-{i}-milligan")
+                hide_fields.append(f"id_form-{i}-milligan_choice")
+
+
+    return hide_fields
+
+
+def remove_duplicates(mulligan):
+    dups_index = []
+
+    for index, item in enumerate(mulligan):
+        print(item)
+        if index == 0: 
+            continue
+        else:
+            if mulligan[index]['team'] == powers["mulligan"][index-1]['team']:
+                dups_index.append(index)
+                print('in here ',powers['mulligan'][index]['team'], ' -> ',powers['mulligan'][index-1]['team']) 
+        
+    print(dups_index)
+    if dups_index:
+        for index in reversed(dups_index):      
+            powers["mulligan"].pop(index)
+
+    return dups_index
