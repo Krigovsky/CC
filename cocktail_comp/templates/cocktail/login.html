@@ -1,0 +1,9 @@
+{% extends "template.html" %}  
+{% block content %}
+<h1>Login page</h1>
+<form action="{% url 'cocktail:login' %}" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Submit">
+</form>
+{% endblock %}

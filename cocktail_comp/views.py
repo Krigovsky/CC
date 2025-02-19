@@ -6,10 +6,11 @@ from django.db.models import F
 from django.views import generic
 from django.forms import formset_factory 
 from django.forms.models import model_to_dict
+from django.contrib.auth.models import User
 
 
 from .models import Couple, GolfGame, GolfCard
-from .forms import RegisterForm, StartGolfGameForm, UpdateScoreForm
+from .forms import RegisterForm, StartGolfGameForm, UpdateScoreForm, UserLoginForm
 
 from .utils import (split_names, decode_name, start_new_game, get_team_members, 
                     create_drive_count, get_power_texts, powers_update, 
@@ -154,7 +155,7 @@ def update_score(request, id, hole):
 
     powers = check_previous_holes(powers, teams, hole)
     print('\n\n')
-    remove = remove_duplicates(powers['mulligan'])
+    remove = remove_duplicates(powers['mulligan'], powers)
     remove = []
     
 
@@ -229,6 +230,34 @@ def go_to_n_hole(request,id, hole):
     print("Currently set hole ->", golf_card.current_hole)
     return redirect('cocktail:update_score', id=id, hole=golf_card.current_hole)
 
-"""
+def teams(request):
+    template = loader.get_template("cocktail/teams.html")   
+    return HttpResponse(template.render())
 
-"""
+def login(request):
+
+    if request.method == "POST":
+        print("form is recived")
+        form = UserLoginForm(request.POST)
+        if form.is_valid():
+            print(form.cleaned_data['first_name'])
+            check = User.objects.filter(username = f"{form.cleaned_data['first_name']}_{form.cleaned_data['last_name']}")
+            if not check:
+                user = User.objects.create_user(first_name = form.cleaned_data['first_name'],
+                                                last_name = form.cleaned_data['last_name'],
+                                                username= f"{form.cleaned_data['first_name']}_{form.cleaned_data['last_name']}",
+                                                password = form.cleaned_data['password'],
+                                                )
+                print(user.password)
+            else:
+                print(check[0].password)
+           
+
+    form = UserLoginForm()
+    template = loader.get_template("cocktail/login.html")
+    return HttpResponse(template.render({"form": form}, request))
+
+
+def start_cocktail (request):
+    template = loader.get_template("cocktail/cocktail_start.html")   
+    return HttpResponse(template.render())

@@ -17,7 +17,7 @@
     </table>
 
     <h2>Drives</h2>
-    <table class="table table-striped table-hover">
+    <table class="table table-striped table-hover ">
 
         {% for key, value in drives.items %}
             <tr>
@@ -32,27 +32,55 @@
         
     </table>
 
-    <div>
-        <h3>Mulligans</h3>
-        <ul>
-            {% for item in mulligans %}
-                <li>{{item}}</li>
-            {% endfor %}
-        </ul>
-    </div>
-
-    <div>
-        <h3>Milligans</h3>
-        <ul>
-            {% for item in milligans %}
-                <li>{{item}}</li>
-            {% endfor %}
-        </ul>
+    <div class="mulligans-container">
+        <!-- Mulligans Section -->
+        <div>
+            <h3 class="center-title">
+                <button class="btn btn-success w-100 text-start" type="button" data-bs-toggle="collapse" data-bs-target="#mulligansCollapse">
+                    Mulligans ▼
+                </button>
+            </h3>
+            <div id="mulligansCollapse" class="collapse">
+                <table class="table table-striped table-hover">
+                    <ul>
+                        {% for item in mulligans %}
+                            <tr>
+                                <td>
+                                    <li class="list-unstyled">{{ item }}</li>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </ul>
+                </table>
+            </div>
+        </div>
+    
+        <!-- Milligans Section -->
+        <div>
+            <h3 class="center-title">
+                <button class="btn btn-success w-100 text-start" type="button" data-bs-toggle="collapse" data-bs-target="#milligansCollapse">
+                    Milligans ▼
+                </button>
+            </h3>
+            <div id="milligansCollapse" class="collapse">
+                <table class="table table-striped table-hover">
+                    <ul>
+                        {% for item in milligans %}
+                            <tr>
+                                <td>
+                                    <li class="list-unstyled">{{ item }}</li>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </ul>
+                </table>
+            </div>
+        </div>
     </div>
 
     {% if card.current_hole <= card.card.number_holes %}
         {% if card.current_hole != 0 %}
-        <a href="{% url 'cocktail:update_score' id=card.id hole=card.current_hole %}" class="btn btn-success">Back to the Hole {{card.current_hole}} </a> 
+        <a href="{% url 'cocktail:update_score' id=card.id hole=card.current_hole %}" class="btn btn-success extra-padding">Back to the Hole {{card.current_hole}} </a> 
         {% else %}
         <a href="{% url 'cocktail:update_score' id=card.id hole=card.current_hole|add:1 %}" class="btn btn-default">Start Game</a>  
         {% endif %}

@@ -194,7 +194,7 @@ def create_hide_list (golf_card, teams):
     return hide_fields
 
 
-def remove_duplicates(mulligan):
+def remove_duplicates(mulligan, powers):
     dups_index = []
 
     for index, item in enumerate(mulligan):

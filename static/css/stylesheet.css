@@ -1,0 +1,53 @@
+.container {
+    padding: 10px;
+  }
+
+.hidden {
+    display: none;
+    visibility: hidden;
+  }
+  
+table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed; /* Ensures equal column width */
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+    width: 10%; /* Adjust based on the number of columns */
+}
+
+thead {
+    background-color: #f2f2f2;
+}
+
+/* Ensures that both tables have the same column width */
+.game-card-table th,
+.game-card-table td,
+.drives-table th,
+.drives-table td {
+    width: 10%; /* Ensuring equal width across tables */
+}
+
+.mulligans-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px; /* Adds spacing between divs */
+}
+
+.mulligans-container div {
+  width: 50%;
+  box-sizing: border-box; /* Ensures padding/margin don’t affect width */
+}
+
+.center-title {
+  text-align: center;
+}
+
+.extra-padding {
+  margin-top: 1rem;
+}
+

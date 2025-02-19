@@ -6,14 +6,10 @@
         {% bootstrap_css %}
         {% bootstrap_javascript %}
         {% load widget_tweaks  %}
+        {% load static %}
+        <link rel="stylesheet" href="{% static 'css/stylesheet.css' %}">
         <style>
-          .container {
-            padding: 10px;
-          }
-          .hidden {
-            display: none;
-            visibility: hidden;
-          }
+
         </style>
     </head>
 
@@ -36,7 +32,13 @@
                       <a class="nav-link" href="{% url 'cocktail:start_golf' %}">Start golf</a>
                     </li>
                     <li class="nav-item">
-                      <a class="nav-link disabled" href="#">Disabled</a>
+                      <a class="nav-link" href="{% url 'cocktail:cocktail_start' %}">Start Cocktail</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="{% url 'cocktail:teams' %}">Teams rego</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="{% url 'cocktail:login' %}">Login</a>
                     </li>
                   </ul>
                 </div>
