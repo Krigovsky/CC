@@ -13,6 +13,8 @@ urlpatterns = [
     path("registraition/", views.registraition, name='registraition'),
     path("teams/", views.teams, name="teams"),
     path("login/", views.login, name="login"),
+    path("register/", views.user_registraition, name="register"),
+    path("user_display/<int:user_id>", views.user_display, name="user_display"),
 
     #golfing portion
     path("startGolf/", views.start_golf, name='start_golf' ),

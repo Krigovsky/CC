@@ -51,3 +51,10 @@ class UserLoginForm (forms.Form):
     last_name = forms.CharField(label="Last Name", max_length=100)
     password = forms.CharField(label="Password", max_length=100)
     
+class UserRegistrationForm (forms.Form):
+    first_name = forms.CharField(label="First Name", max_length=100)
+    last_name = forms.CharField(label="Last Name", max_length=100)
+    password = forms.CharField(label="Password", max_length=100)
+
+class JoinTeamForm (forms.form):
+    name = forms.CharField(label="testing")

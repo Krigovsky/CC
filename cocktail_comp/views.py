@@ -234,6 +234,32 @@ def teams(request):
     template = loader.get_template("cocktail/teams.html")   
     return HttpResponse(template.render())
 
+def user_registraition(request):
+
+    if request.method == "POST":
+        print("form is recived")
+        form = UserLoginForm(request.POST)
+        if form.is_valid():
+            print(form.cleaned_data['first_name'])
+            user = User.objects.filter(username = f"{form.cleaned_data['first_name']}_{form.cleaned_data['last_name']}").first()
+            if not user:
+                user = User.objects.create_user(first_name = form.cleaned_data['first_name'],
+                                                last_name = form.cleaned_data['last_name'],
+                                                username= f"{form.cleaned_data['first_name']}_{form.cleaned_data['last_name']}",
+                                                password = form.cleaned_data['password'],
+                                                )
+                print(user.password)
+            else:
+                print(user.password, ' -> ', user.id)
+
+            return redirect('cocktail:user_display', user_id = user.id)
+           
+
+    form = UserLoginForm()
+    template = loader.get_template("cocktail/user-register.html")
+    return HttpResponse(template.render({"form": form}, request))
+
+
 def login(request):
 
     if request.method == "POST":
@@ -256,6 +282,18 @@ def login(request):
     form = UserLoginForm()
     template = loader.get_template("cocktail/login.html")
     return HttpResponse(template.render({"form": form}, request))
+
+def user_display(request, user_id):
+    print("in user display -> ", user_id)
+    user = User.objects.filter(id=user_id).first()
+    print("user -> ", user.id, f' -> {user.first_name} {user.last_name}')
+
+    template = loader.get_template("cocktail/user_display.html")
+    
+    return HttpResponse(template.render({
+        'user_name' : f'{user.first_name} {user.last_name}',
+        
+    }))
 
 
 def start_cocktail (request):
