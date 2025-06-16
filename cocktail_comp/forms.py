@@ -56,5 +56,19 @@ class UserRegistrationForm (forms.Form):
     last_name = forms.CharField(label="Last Name", max_length=100)
     password = forms.CharField(label="Password", max_length=100)
 
-class JoinTeamForm (forms.form):
+class JoinTeamForm (forms.Form):
     name = forms.CharField(label="testing")
+
+
+class TeamUpdateForm (forms.Form):
+    def CHOICES():
+        teams = Couple.objects.filter().all()
+        choices = [(team.team, team.team) for i,team in enumerate(teams)]
+        print(choices)
+        # for item in teams:
+        #     choices.append((f"{item}", f"{item}"))
+        #     print(item)
+        return choices
+
+    team_name = forms.ChoiceField(label="What team are you looking to join/make adjustments for?",
+                                  choices=CHOICES())

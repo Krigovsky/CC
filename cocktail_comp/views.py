@@ -10,7 +10,7 @@ from django.contrib.auth.models import User
 
 
 from .models import Couple, GolfGame, GolfCard
-from .forms import RegisterForm, StartGolfGameForm, UpdateScoreForm, UserLoginForm
+from .forms import RegisterForm, StartGolfGameForm, UpdateScoreForm, UserLoginForm, TeamUpdateForm
 
 from .utils import (split_names, decode_name, start_new_game, get_team_members, 
                     create_drive_count, get_power_texts, powers_update, 
@@ -231,8 +231,21 @@ def go_to_n_hole(request,id, hole):
     return redirect('cocktail:update_score', id=id, hole=golf_card.current_hole)
 
 def teams(request):
+    if 'teams' in request.POST:
+        chosen_team_form = TeamUpdateForm(request.POST)
+        if chosen_team_form.is_valid():
+
+            print("team chosen to edit -> ", chosen_team_form.cleaned_data["team_name"])
+
     template = loader.get_template("cocktail/teams.html")   
-    return HttpResponse(template.render())
+    teams_form = TeamUpdateForm() 
+    # for item in teams:
+    #     print(item, item.partner_names)
+    form = RegisterForm()
+    context = { "form" : form,
+                "teams" : teams_form 
+                }
+    return HttpResponse(template.render(context, request))
 
 def user_registraition(request):
 

@@ -1,4 +1,12 @@
 {% extends "template.html" %}  
 {% block content %}
 <h1>Team join or create page</h1>
+<form action="{% url 'cocktail:teams' %}" method="post">
+    {% csrf_token %}
+    {{ teams.as_p }}
+    <input type="submit" name='teams' value="Submit">
+</form>
+
+
+    
 {% endblock %}
