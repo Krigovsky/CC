@@ -72,3 +72,17 @@ class TeamUpdateForm (forms.Form):
 
     team_name = forms.ChoiceField(label="What team are you looking to join/make adjustments for?",
                                   choices=CHOICES())
+    
+class StartCompetitionForm (forms.Form):
+    CHOICES = [
+        ('1', 'Normal')
+    ]
+
+    date = forms.DateTimeField(label="What Day?")
+    # Golf Details
+    game_type = forms.ChoiceField(label="What type of golf are we playing",choices=CHOICES)
+    location = forms.ChoiceField(label="Where is the game beign palyed", choices=CHOICES)
+    number_holes = forms.ChoiceField(label="How many holes are being played", choices=holes)
+    teams_playing = forms.ModelMultipleChoiceField(label="Which Teams are playing", queryset=Couple.objects.all(), widget=forms.CheckboxSelectMultiple)
+    # Cocktails Details if needed
+    

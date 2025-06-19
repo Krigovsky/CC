@@ -7,6 +7,30 @@
     <input type="submit" name='teams' value="Submit">
 </form>
 
+{% if choosen_team %}
+    <form action="{% url 'cocktail:teams' %}" method="post">
+
+        <label for="team-name">Your current team name: {{choosen_team.team}}</label>
+        <input type="text" name="team-name" id="team-name">
+        </br> 
+        
+        {% for person in choosen_team.partner_names %}
+        
+            <label for="team-members">Team Member 1: {{person}} : 
+            </label>
+            <select name="team-member-1" id="team-member-1">
+                {%for user in users%}
+                    <option value={{user}}>{{user}}</option>
+                {% endfor %}
+            </select>
+            </br>
+        {% endfor %}
+
+        </br> </br> 
+        <input type="submit" name="update_teams" value="Submit">
+    </form>
+{% endif %}
+
 
     
 {% endblock %}

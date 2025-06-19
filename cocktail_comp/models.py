@@ -45,3 +45,27 @@ class GolfCard (models.Model):
     allowed_drivers = models.CharField(max_length=200, default=[])
 
     powers = models.CharField(max_length=200, default={})
+
+class CocktailCard (models.Model):
+    compeition_id = models.IntegerField()
+    team_name = models.CharField(max_length=200)
+    presentation_score = models.IntegerField(null=True)
+    presentation_comments = models.CharField(max_length=500, null=True)
+    taste_score = models.IntegerField(null=True)
+    taste_comments = models.CharField(max_length=500, null=True)
+    creativity_score = models.IntegerField(null=True)
+    creativity_comments = models.CharField(max_length=500, null=True)
+    theme_score = models.IntegerField(null=True)
+    theme_comments = models.CharField(max_length=500, null=True)
+    drinkability_score = models.IntegerField(null=True)
+    drinkability_comments = models.CharField(max_length=500, null=True)
+    total = models.IntegerField(default=0)
+    
+class CompetitionStart (models.Model):
+
+    date = models.DateField()
+    teams = models.CharField(max_length=200)
+    golf_card = models.ForeignKey(GolfCard, on_delete=models.CASCADE, null=True)
+    cocktail_card = models.ForeignKey(CocktailCard, on_delete=models.CASCADE, null=True)
+
+    pass

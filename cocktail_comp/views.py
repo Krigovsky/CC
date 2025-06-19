@@ -231,16 +231,28 @@ def go_to_n_hole(request,id, hole):
     return redirect('cocktail:update_score', id=id, hole=golf_card.current_hole)
 
 def teams(request):
+    template = loader.get_template("cocktail/teams.html")   
+
     if 'teams' in request.POST:
         chosen_team_form = TeamUpdateForm(request.POST)
         if chosen_team_form.is_valid():
+            
+            team = Couple.objects.filter(team=chosen_team_form.cleaned_data["team_name"]).first()
+            team.partner_names = ast.literal_eval(team.partner_names)
 
-            print("team chosen to edit -> ", chosen_team_form.cleaned_data["team_name"])
+            users = User.objects.filter().all()
 
-    template = loader.get_template("cocktail/teams.html")   
+            teams_form = TeamUpdateForm() 
+            form = RegisterForm()
+            context = { "form" : form,
+                        "teams" : teams_form,
+                        "choosen_team" : team,
+                        "users" : users
+                        }
+        return HttpResponse(template.render(context, request))
+    
+
     teams_form = TeamUpdateForm() 
-    # for item in teams:
-    #     print(item, item.partner_names)
     form = RegisterForm()
     context = { "form" : form,
                 "teams" : teams_form 
@@ -310,5 +322,12 @@ def user_display(request, user_id):
 
 
 def start_cocktail (request):
+
+
     template = loader.get_template("cocktail/cocktail_start.html")   
+    return HttpResponse(template.render())
+
+def start_competition (request):
+    
+    template = loader.get_template("cocktail/start.html")
     return HttpResponse(template.render())
