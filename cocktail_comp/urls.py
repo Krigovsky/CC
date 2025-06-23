@@ -18,12 +18,12 @@ urlpatterns = [
     path("start/", views.start_competition, name="start"),
 
     #golfing portion
-    path("startGolf/", views.start_golf, name='start_golf' ),
+    # path("startGolf/", views.start_golf, name='start_golf' ), #deprecated
     path("card/", views.golf_card, name='golf_card'),
     path("update_score/<int:id>/<int:hole>", views.update_score, name="update_score"),
     path("scoreCard/<int:id>/<hole>", views.score_card, name="score_card"),
     path("change_hole/<int:id>/<int:hole>/", views.go_to_n_hole, name="hole"),
 
     #cocktail portion
-    path("cocktail_start/", views.start_cocktail, name="cocktail_start"),
+    path("cocktail/<int:id>", views.cocktail, name="cocktail"),
 ]

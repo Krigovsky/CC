@@ -77,12 +77,28 @@ class StartCompetitionForm (forms.Form):
     CHOICES = [
         ('1', 'Normal')
     ]
+    # Universal
+    
+    teams_playing = forms.ModelMultipleChoiceField(label="Which Teams are joining?", queryset=Couple.objects.all(), widget=forms.CheckboxSelectMultiple)
 
-    date = forms.DateTimeField(label="What Day?")
     # Golf Details
     game_type = forms.ChoiceField(label="What type of golf are we playing",choices=CHOICES)
     location = forms.ChoiceField(label="Where is the game beign palyed", choices=CHOICES)
     number_holes = forms.ChoiceField(label="How many holes are being played", choices=holes)
-    teams_playing = forms.ModelMultipleChoiceField(label="Which Teams are playing", queryset=Couple.objects.all(), widget=forms.CheckboxSelectMultiple)
     # Cocktails Details if needed
+    
+class CocktailFormScore(forms.Form):
+    presentation_score = forms.IntegerField(label="Presentation")
+    taste_score = forms.IntegerField(label="Taste & Balance")
+    creativity_score = forms.IntegerField(label="Creativity & Originality")
+    theme_score = forms.IntegerField(label="Appropriateness to Theme")
+    drinkability_score = forms.IntegerField(label="Drinkability")
+
+class CocktailFormComments(forms.Form):
+
+    presentation_comments = forms.CharField(label="presentation_comments")
+    taste_comments = forms.CharField(label="taste_comments")
+    creativity_comments = forms.CharField(label="creativity_comments")
+    theme_comments = forms.CharField(label="theme_comments")
+    drinkability_comments = forms.CharField(label="drinkability_comments")
     

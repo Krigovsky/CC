@@ -86,6 +86,7 @@
         {% endif %}
      
     {% else %}
-        <a href="{% url 'cocktail:view' %}" class="btn btn-default">End Game</a>          
+        <a href="{% url 'cocktail:cocktail' id=comp_id %}" class="btn btn-default">Onto Cocktail Portion</a>          
     {% endif %}
+    <a href="{% url 'cocktail:cocktail' id=comp_id %}" class="btn btn-default">Onto Cocktail Portion</a> 
 {% endblock %}

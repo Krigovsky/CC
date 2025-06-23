@@ -1,4 +1,4 @@
-from .models import GolfGame, GolfCard, Couple
+from .models import GolfGame, GolfCard, Couple, CocktailCard, CompetitionStart
 
 from datetime import datetime
 import ast 
@@ -88,13 +88,6 @@ def start_new_game(form):
                                         )
     return game_card
 
-    """
-    card = {
-            # : [0,1,2,3,4,5,6,7,8,9]
-            team1 : [0,1,2,3,4,5,6,7,8,9]
-            team2 : [0,1,2,3,4,5,6,7,8,9]
-            }
-    """
 
 def get_team_members(team_name):
     couple = Couple.objects.filter(team=team_name).first()
@@ -171,6 +164,8 @@ def check_previous_holes (powers, teams, hole):
     # print(mill_add_back_in)
 
     return powers
+
+
 def create_hide_list (golf_card, teams):
     hide_fields =[]
     # print("\nMulligans")
@@ -212,3 +207,47 @@ def remove_duplicates(mulligan, powers):
             powers["mulligan"].pop(index)
 
     return dups_index
+
+def start_cocktail(form):
+    # print("Teams -> ", type(form.cleaned_data["teams_playing"]), form.cleaned_data["teams_playing"])
+    # Take team names
+    teams = [x.team for x in form.cleaned_data["teams_playing"]]
+    # print("teams -> ", type(teams), teams)
+    
+    cocktail = CocktailCard.objects.create(teams = teams,
+                                           presentation_score = [0 for i in range(len(teams))],
+                                           presentation_comments = ['' for i in range(len(teams))],
+
+                                           taste_score = [0 for i in range(len(teams))],
+                                           taste_comments = ['' for i in range(len(teams))],
+
+                                           creativity_score = [0 for i in range(len(teams))],
+                                           creativity_comments = ['' for i in range(len(teams))],
+
+                                           theme_score = [0 for i in range(len(teams))],
+                                           theme_comments = ['' for i in range(len(teams))],
+
+                                           drinkability_score = [0 for i in range(len(teams))],
+                                           drinkability_comments = ['' for i in range(len(teams))],
+
+                                           total = [0 for i in range(len(teams))],
+                                           )
+    return cocktail
+
+def start_compeition(form):
+    # Create golf variables and db instence
+    golf = start_new_game(form)
+    # print(golf)
+
+    # Create Cocktail variables and db instence
+    cocktail = start_cocktail(form)
+    # print(cocktail)
+
+    start = CompetitionStart.objects.create(
+        date = datetime.now(),
+        teams = [x.team for x in form.cleaned_data["teams_playing"]],
+        golf_card = golf,
+        cocktail_card = cocktail
+    )
+    
+    return start

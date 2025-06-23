@@ -9,12 +9,16 @@ from django.forms.models import model_to_dict
 from django.contrib.auth.models import User
 
 
-from .models import Couple, GolfGame, GolfCard
-from .forms import RegisterForm, StartGolfGameForm, UpdateScoreForm, UserLoginForm, TeamUpdateForm
+from .models import Couple, GolfGame, GolfCard, CompetitionStart
+from .forms import (RegisterForm, StartGolfGameForm, UpdateScoreForm, 
+                    UserLoginForm, TeamUpdateForm, StartCompetitionForm,
+                    CocktailFormScore, CocktailFormComments
+                    )
 
 from .utils import (split_names, decode_name, start_new_game, get_team_members, 
                     create_drive_count, get_power_texts, powers_update, 
                     check_previous_holes, create_hide_list, remove_duplicates,
+                    start_compeition, 
                     )
 
 import ast 
@@ -52,12 +56,12 @@ def view (request):
         couple_name = decode_name(couple.partner_names)
     return render(request, "cocktail/view.html", { "couples" : couples})
 
-def start_golf (request):
-    print("on start of golf page")
-    template = loader.get_template("cocktail/start_golf.html")
-    form = StartGolfGameForm()
-    context = { "form" : form }
-    return HttpResponse(template.render(context, request))
+# def start_golf (request):
+#     print("on start of golf page")
+#     template = loader.get_template("cocktail/start_golf.html")
+#     form = StartGolfGameForm()
+#     context = { "form" : form }
+#     return HttpResponse(template.render(context, request))
 
 def golf_card (request):
     print("Creating the card")
@@ -195,8 +199,11 @@ def update_score(request, id, hole):
                                          }, request))
 
 def score_card (request, id, hole):
+
     #Grab the golf card based of the id passed through in the url
     golf_card = GolfCard.objects.filter(id=id).first()
+    comp = CompetitionStart.objects.filter(golf_card = golf_card).first()
+
     results_dict = ast.literal_eval(golf_card.results)
     
     card_drivers_dict = ast.literal_eval(golf_card.card_driver)
@@ -216,7 +223,8 @@ def score_card (request, id, hole):
                                          "results" : results_dict,
                                          "drives" : card_drivers_dict,
                                          "mulligans" : mulligans,
-                                         "milligans" : milligans
+                                         "milligans" : milligans,
+                                         "comp_id" : comp.id
                                          }, request))
 
 
@@ -321,13 +329,40 @@ def user_display(request, user_id):
     }))
 
 
-def start_cocktail (request):
+def cocktail (request, id):
+    print("Made into cocktail -> ", id)
+    form = CocktailFormScore()
+    comments = CocktailFormComments()
+    descriptions = [
+        "How visually appealing is the cocktail?\nConsider: Glassware Choice, garnish creativity/placement, overall aesthetic appeal.",
+        "Does the cocktail have a pleasing flavour? is it well-balanced, with no ingredient overpowering the other?\nConsider: Sweetness, sourness, bitterness, saltiness, alcohol intergration, complexity and harmony.",
+        "How unique and inventive is the cocktail?\nConsider: uncommon flavour combinations, innovative techniques, originality.",
+        "Does hte cocktail fit the competition's theme (if applicable)?\nConsider: Is it seasonally or contextually appropriate.",
+        "Would you want to drink this agian?\nConsider: Overall enjoyment, ease of drinking (not too strong/weak)",
+    ]
 
-
-    template = loader.get_template("cocktail/cocktail_start.html")   
-    return HttpResponse(template.render())
+    forms = zip(form, comments, descriptions)
+    context = {
+        'form' : forms,
+        'score_form' : form,
+        'comments_form' : comments
+    }
+    template = loader.get_template("cocktail/cocktail.html")   
+    return HttpResponse(template.render(context, request))
 
 def start_competition (request):
+    if request.method == "POST":
+        form = StartCompetitionForm(request.POST)
+
+        if form.is_valid():
+            print("### Starting Competition form is valid ###")
+            start = start_compeition(form)
+            return redirect('cocktail:score_card', id=start.golf_card.id, hole=start.golf_card.current_hole)
+
+    form = StartCompetitionForm()
+    context = {
+        "form" : form
+    }
     
     template = loader.get_template("cocktail/start.html")
-    return HttpResponse(template.render())
+    return HttpResponse(template.render(context, request))

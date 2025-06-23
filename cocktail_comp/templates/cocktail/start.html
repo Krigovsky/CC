@@ -1,5 +1,11 @@
 {% extends "template.html" %}  
 {% block content %}
 <h1>Competition Start</h1>
+<form action="{% url 'cocktail:start' %}" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Submit">
+</form>
+
 
 {% endblock %}
