@@ -2,6 +2,7 @@ from .models import GolfGame, GolfCard, Couple, CocktailCard, CompetitionStart
 
 from datetime import datetime
 import ast 
+import random
 
 def split_names(names):
     name = names.split(', ')
@@ -212,7 +213,10 @@ def start_cocktail(form):
     # print("Teams -> ", type(form.cleaned_data["teams_playing"]), form.cleaned_data["teams_playing"])
     # Take team names
     teams = [x.team for x in form.cleaned_data["teams_playing"]]
-    # print("teams -> ", type(teams), teams)
+    random_order = [x for x in range(len(teams))]
+    random.shuffle(random_order)
+
+    print('Random order ->',random_order)
     
     cocktail = CocktailCard.objects.create(teams = teams,
                                            presentation_score = [0 for i in range(len(teams))],
@@ -231,6 +235,7 @@ def start_cocktail(form):
                                            drinkability_comments = ['' for i in range(len(teams))],
 
                                            total = [0 for i in range(len(teams))],
+                                           order = random_order
                                            )
     return cocktail
 

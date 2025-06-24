@@ -26,4 +26,7 @@ urlpatterns = [
 
     #cocktail portion
     path("cocktail/<int:id>", views.cocktail, name="cocktail"),
+    path("cocktail_card/<int:id>", views.cocktail_card, name="cocktail_card"),
+    path("cocktail_add/<int:id>", views.cocktail_add, name="cocktail_add"),
+
 ]

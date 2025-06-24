@@ -29,6 +29,9 @@
         </br> </br> 
         <input type="submit" name="update_teams" value="Submit">
     </form>
+
+    <h5>If above details are correct use buttons to add your cocktail</h5>
+    <a href="{% url 'cocktail:cocktail_add' id=choosen_team.id %}" class="btn btn-success">Add Cocktail</a>
 {% endif %}
 
 

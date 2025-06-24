@@ -2,30 +2,9 @@
 {% block content %}
 <h1>Cockatil Marking Start</h1>
 
-<form action="{% url 'cocktail:teams' %}" method="post">
-    {% csrf_token %}
-    <table>
-        <tr>
-            <th>Category</th>
-            <th>Description</th>
-            <th>Score</th>
-            <th>Comments</th>
+{% for team in order %}
+    <p>{{team}}</p>
+{% endfor %}
 
-        </tr>
-        
-        {% for score, comments, descriptions in form %}
-            <tr>
-                <td>{{score.label_tag}}</td>
-                <td>{{descriptions}}</td>
-                <td>{{score}}</td>
-                <td>{{comments}}</td>
-            </tr>
-        {% endfor %}
-        
-
-    </table>
-    <input type="submit" name='teams' value="Submit">
-</form>
-
-
+<a href="{% url 'cocktail:cocktail_card' id=comp_id %}" class="btn btn-default">Start Cocktails</a>
 {% endblock %}

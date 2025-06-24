@@ -9,10 +9,11 @@ from django.forms.models import model_to_dict
 from django.contrib.auth.models import User
 
 
-from .models import Couple, GolfGame, GolfCard, CompetitionStart
+from .models import Couple, GolfGame, GolfCard, CompetitionStart, Cocktail
 from .forms import (RegisterForm, StartGolfGameForm, UpdateScoreForm, 
                     UserLoginForm, TeamUpdateForm, StartCompetitionForm,
-                    CocktailFormScore, CocktailFormComments
+                    CocktailFormScore, CocktailFormComments, CocktailAddForm,
+
                     )
 
 from .utils import (split_names, decode_name, start_new_game, get_team_members, 
@@ -23,6 +24,7 @@ from .utils import (split_names, decode_name, start_new_game, get_team_members,
 
 import ast 
 import json
+from datetime import datetime
 
 # Create your views here.
 def index (request):
@@ -46,6 +48,8 @@ def view (request):
             # print("Partner names -> ", form.cleaned_data["partner_names"], type(form.cleaned_data["partner_names"]))
             names = split_names(form.cleaned_data["partner_names"])
             cpl_session = Couple.objects.create(team=form.cleaned_data["team_name"], partner_names=names)
+
+            return redirect('cocktail:cocktail_add', id=cpl_session.id)
             
 
     couples = get_list_or_404(Couple)
@@ -263,8 +267,42 @@ def teams(request):
     teams_form = TeamUpdateForm() 
     form = RegisterForm()
     context = { "form" : form,
-                "teams" : teams_form 
+                "teams" : teams_form,
                 }
+    return HttpResponse(template.render(context, request))
+
+def cocktail_add(request, id):
+    print("IN cocktail add. Team ID -> ", id)
+
+    if request.method == "POST":
+        form = CocktailAddForm(request.POST)
+        
+        try:
+            cocktail = Cocktail.objects.filter(team_id=id, date=datetime.now())
+            print("Cocktail of same team done on the same day")  
+        except:
+            cocktail = False
+            print("No existing cocktials found")
+
+        if form.is_valid() and not cocktail:
+            Cocktail.objects.create(
+                date = datetime.now(),
+                team = Couple.objects.filter(id=id).first(),
+                cocktail_name=form.cleaned_data["cocktail_name"],
+                alcohol_base=form.cleaned_data["alcohol_base"], 
+                mixers=form.cleaned_data["mixers"],             
+                garnish=form.cleaned_data["garnish"], 
+                total_score = 0
+            )
+        else:
+            print("Cocktail not added into database")
+    
+    form = CocktailAddForm()
+    context = {
+        "form" : form,
+        "team_id" : id,
+    }
+    template = loader.get_template("cocktail/cocktail_add.html")
     return HttpResponse(template.render(context, request))
 
 def user_registraition(request):
@@ -328,8 +366,29 @@ def user_display(request, user_id):
         
     }))
 
-
 def cocktail (request, id):
+    print("Made into cocktail -> ", id)
+    comp = CompetitionStart.objects.filter(id = id).first()
+    print("Found Comp -> ", comp.cocktail_card.order)
+
+    order = ast.literal_eval(comp.cocktail_card.order)
+    teams = ast.literal_eval(comp.teams)
+
+    print('order -> ', order)
+    print('teams -> ', teams)
+
+    cocktail_order = [teams[i] for i in order]
+    print("Cocktail order = ", cocktail_order)
+
+    context = {
+        'order' : cocktail_order,
+        'comp_id' : comp.id,
+    }
+
+    template = loader.get_template("cocktail/cocktail.html")   
+    return HttpResponse(template.render(context, request))
+
+def cocktail_card (request, id):
     print("Made into cocktail -> ", id)
     form = CocktailFormScore()
     comments = CocktailFormComments()
@@ -347,7 +406,7 @@ def cocktail (request, id):
         'score_form' : form,
         'comments_form' : comments
     }
-    template = loader.get_template("cocktail/cocktail.html")   
+    template = loader.get_template("cocktail/cocktail_card.html")   
     return HttpResponse(template.render(context, request))
 
 def start_competition (request):

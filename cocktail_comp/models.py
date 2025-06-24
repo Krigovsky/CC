@@ -46,6 +46,16 @@ class GolfCard (models.Model):
 
     powers = models.CharField(max_length=200, default={})
 
+class Cocktail (models.Model):
+
+    date = models.DateField()
+    team = models.ForeignKey(Couple, on_delete=models.CASCADE, null=True)
+    cocktail_name = models.CharField(max_length=255, null=True)
+    alcohol_base = models.CharField(max_length=255, null=True)
+    mixers = models.CharField(max_length=255, null=True)
+    garnish = models.CharField(max_length=250)
+    total_score = models.CharField(max_length=250, null=True)
+
 class CocktailCard (models.Model):
     
     teams = models.CharField(max_length=200)
@@ -61,6 +71,7 @@ class CocktailCard (models.Model):
     drinkability_comments = models.TextField(null=True)
     total = models.CharField(max_length=500, null=True)
     order = models.CharField(max_length=500, null=True)
+    cocktail_list = models.CharField(max_length=255, null=True)
     
 class CompetitionStart (models.Model):
 
@@ -69,4 +80,3 @@ class CompetitionStart (models.Model):
     golf_card = models.ForeignKey(GolfCard, on_delete=models.CASCADE, null=True)
     cocktail_card = models.ForeignKey(CocktailCard, on_delete=models.CASCADE, null=True)
 
-    pass

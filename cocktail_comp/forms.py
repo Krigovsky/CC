@@ -95,10 +95,16 @@ class CocktailFormScore(forms.Form):
     drinkability_score = forms.IntegerField(label="Drinkability")
 
 class CocktailFormComments(forms.Form):
-
     presentation_comments = forms.CharField(label="presentation_comments")
     taste_comments = forms.CharField(label="taste_comments")
     creativity_comments = forms.CharField(label="creativity_comments")
     theme_comments = forms.CharField(label="theme_comments")
     drinkability_comments = forms.CharField(label="drinkability_comments")
+
+class CocktailAddForm (forms.Form):
+    cocktail_name = forms.CharField(label="Name of the cocktail")
+    alcohol_base = forms.CharField(label="What alchol is used?")
+    mixers = forms.CharField(label="What mixers are used?")
+    garnish = forms.CharField(label="What are you using to garnish")
+    
     
