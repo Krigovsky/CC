@@ -47,7 +47,11 @@ class GolfCard (models.Model):
     powers = models.CharField(max_length=200, default={})
 
 class Cocktail (models.Model):
-
+    def __str__(self):
+        return f"""Cocktail 
+    Team: {self.team}
+    name: {self.cocktail_name} 
+"""
     date = models.DateField()
     team = models.ForeignKey(Couple, on_delete=models.CASCADE, null=True)
     cocktail_name = models.CharField(max_length=255, null=True)
@@ -57,7 +61,11 @@ class Cocktail (models.Model):
     total_score = models.CharField(max_length=250, null=True)
 
 class CocktailCard (models.Model):
-    
+    def __str__(self):
+        return f"""Cocktail Card
+    Teams: {self.teams}
+    Order: {self.order}    
+"""
     teams = models.CharField(max_length=200)
     presentation_score = models.CharField(max_length=500, null=True)
     presentation_comments = models.TextField(null=True)
@@ -71,6 +79,7 @@ class CocktailCard (models.Model):
     drinkability_comments = models.TextField(null=True)
     total = models.CharField(max_length=500, null=True)
     order = models.CharField(max_length=500, null=True)
+    current_index = models.IntegerField(default=0)
     cocktail_list = models.CharField(max_length=255, null=True)
     
 class CompetitionStart (models.Model):

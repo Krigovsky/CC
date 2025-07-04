@@ -256,3 +256,13 @@ def start_compeition(form):
     )
     
     return start
+
+def create_cocktail_description(current_cocktail):
+    print(type(current_cocktail))
+    temp = {
+        "Title" : current_cocktail.cocktail_name,
+        "Alcohol Base" : current_cocktail.alcohol_base,
+        "Mixers" : current_cocktail.mixers,
+        "Garnish" : current_cocktail.garnish,
+    }
+    return temp

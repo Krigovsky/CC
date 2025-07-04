@@ -19,7 +19,7 @@ from .forms import (RegisterForm, StartGolfGameForm, UpdateScoreForm,
 from .utils import (split_names, decode_name, start_new_game, get_team_members, 
                     create_drive_count, get_power_texts, powers_update, 
                     check_previous_holes, create_hide_list, remove_duplicates,
-                    start_compeition, 
+                    start_compeition, create_cocktail_description
                     )
 
 import ast 
@@ -261,7 +261,7 @@ def teams(request):
                         "choosen_team" : team,
                         "users" : users
                         }
-        return HttpResponse(template.render(context, request))
+            return HttpResponse(template.render(context, request))
     
 
     teams_form = TeamUpdateForm() 
@@ -388,23 +388,55 @@ def cocktail (request, id):
     template = loader.get_template("cocktail/cocktail.html")   
     return HttpResponse(template.render(context, request))
 
-def cocktail_card (request, id):
+def cocktail_card (request, id, index=0):
     print("Made into cocktail -> ", id)
+
+    if request.method == "POST":
+        print("made it here")
+        score = CocktailFormScore(request.POST)
+        comments = CocktailFormComments(request.POST)
+
+        comp = CompetitionStart.objects.filter(id=id).first()
+        index = comp.cocktail_card.current_index + 1
+        comp.cocktail_card.current_index = index
+        comp.cocktail_card.save()
+    
+
+        
+
     form = CocktailFormScore()
     comments = CocktailFormComments()
     descriptions = [
         "How visually appealing is the cocktail?\nConsider: Glassware Choice, garnish creativity/placement, overall aesthetic appeal.",
         "Does the cocktail have a pleasing flavour? is it well-balanced, with no ingredient overpowering the other?\nConsider: Sweetness, sourness, bitterness, saltiness, alcohol intergration, complexity and harmony.",
         "How unique and inventive is the cocktail?\nConsider: uncommon flavour combinations, innovative techniques, originality.",
-        "Does hte cocktail fit the competition's theme (if applicable)?\nConsider: Is it seasonally or contextually appropriate.",
+        "Does the cocktail fit the competition's theme (if applicable)?\nConsider: Is it seasonally or contextually appropriate.",
         "Would you want to drink this agian?\nConsider: Overall enjoyment, ease of drinking (not too strong/weak)",
     ]
+    
+    comp = CompetitionStart.objects.filter(id=id).first()
+    print(comp.teams)
+    comp_teams = ast.literal_eval(comp.teams)
+    order = ast.literal_eval(comp.cocktail_card.order)
+    print("current order -> ", order)
+    print("current index -> ", comp.cocktail_card.current_index)
+
+    print(comp_teams[order[comp.cocktail_card.current_index]])
+
+    couple = Couple.objects.filter(team=comp_teams[order[comp.cocktail_card.current_index]]).first()
+    print(couple)
+
+    current_cocktail = Cocktail.objects.filter(team=couple.id).first()
+    next_up = create_cocktail_description(current_cocktail)
+
+    print(next_up)
 
     forms = zip(form, comments, descriptions)
     context = {
         'form' : forms,
-        'score_form' : form,
-        'comments_form' : comments
+        'index' : order,
+        'id' : id,
+        'cocktail_details' : next_up
     }
     template = loader.get_template("cocktail/cocktail_card.html")   
     return HttpResponse(template.render(context, request))
