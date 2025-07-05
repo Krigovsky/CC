@@ -1,6 +1,10 @@
 {% extends "template.html" %}  
 {% block content %}
 <h1>Cockatil Marking Start</h1>
+{% for key, item in cocktail_details.items %}
+    <h3>{{key}}:</h1>
+    <p>{{item}}</p>
+{% endfor %}
 
 <form action="{% url 'cocktail:cocktail_card' id=id %}" method="post">
     {% csrf_token %}
