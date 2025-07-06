@@ -1,4 +1,16 @@
 {% extends "template.html" %}
 {% block content %}
     <p>Home page</p>
+    <div class="form-start">
+        <form action="/cocktail/" method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+
+
+            <button type="submit" class="btn btn-success">  
+                <span class="glyphicon glyphicon-ok"></span> Create User 
+              </button>  
+             
+        </form>
+    </div>
 {% endblock %}

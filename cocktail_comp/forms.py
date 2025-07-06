@@ -6,6 +6,7 @@ holes = (
             ("9", "Nine"),
             ("18", "Eighteen")
         )
+
 class RegisterForm (forms.Form):
     def __init__ (self, *args, **kwargs):
         super().__init__(*args, **kwargs)

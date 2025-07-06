@@ -6,6 +6,7 @@ from django.db.models import F
 from django.views import generic
 from django.forms import formset_factory 
 from django.forms.models import model_to_dict
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 
 
@@ -13,6 +14,7 @@ from .models import Couple, GolfGame, GolfCard, CompetitionStart, Cocktail
 from .forms import (RegisterForm, StartGolfGameForm, UpdateScoreForm, 
                     UserLoginForm, TeamUpdateForm, StartCompetitionForm,
                     CocktailFormScore, CocktailFormComments, CocktailAddForm,
+                    UserRegistrationForm,
 
                     )
 
@@ -28,7 +30,47 @@ from datetime import datetime
 
 # Create your views here.
 def index (request):
-    return render(request, "cocktail/index.html")
+    if request.method == "POST":
+        print("here")
+        form = UserRegistrationForm(request.POST)
+        if form.is_valid():
+
+            user = User.objects.create_user(first_name=form.cleaned_data["first_name"],
+                                            last_name=form.cleaned_data['last_name'],
+                                            password=form.cleaned_data['password'],
+                                            username=f"{form.cleaned_data["first_name"]}_{form.cleaned_data['last_name']}" )
+            print("user created")
+            return redirect('cocktail:login')
+        
+    template = loader.get_template("cocktail/index.html")
+    form = UserRegistrationForm()
+    context = {
+        'form' : form
+    }
+    print("Firtst here")
+    return HttpResponse(template.render(context, request))
+
+def user_login(request):
+    if request.method == "POST":
+        form = UserLoginForm(request.POST)
+        print("im here")
+        if form.is_valid():
+            user = authenticate(request, 
+                                username=f"{form.cleaned_data["first_name"]}_{form.cleaned_data['last_name']}",
+                                password=form.cleaned_data['password'])
+            if user is not None:
+                login(request, user)
+                print("User is logged in")
+                return redirect('cocktail:start')
+            else:
+                return redirect('cocktail:index')
+            
+    template = loader.get_template("cocktail/login.html")
+    form = UserLoginForm()
+    context = {
+        'form' : form
+    }
+    return HttpResponse(template.render(context, request))
 
 def registraition (request):
     print("On registration page")
@@ -38,7 +80,6 @@ def registraition (request):
     return HttpResponse(template.render(context, request))
 
 def view (request):
-
     if request.method == "POST":
         print("IN THE IF STATEMENT")
         form = RegisterForm(request.POST)
@@ -331,28 +372,28 @@ def user_registraition(request):
     return HttpResponse(template.render({"form": form}, request))
 
 
-def login(request):
+# def login(request):
 
-    if request.method == "POST":
-        print("form is recived")
-        form = UserLoginForm(request.POST)
-        if form.is_valid():
-            print(form.cleaned_data['first_name'])
-            check = User.objects.filter(username = f"{form.cleaned_data['first_name']}_{form.cleaned_data['last_name']}")
-            if not check:
-                user = User.objects.create_user(first_name = form.cleaned_data['first_name'],
-                                                last_name = form.cleaned_data['last_name'],
-                                                username= f"{form.cleaned_data['first_name']}_{form.cleaned_data['last_name']}",
-                                                password = form.cleaned_data['password'],
-                                                )
-                print(user.password)
-            else:
-                print(check[0].password)
+#     if request.method == "POST":
+#         print("form is recived")
+#         form = UserLoginForm(request.POST)
+#         if form.is_valid():
+#             print(form.cleaned_data['first_name'])
+#             check = User.objects.filter(username = f"{form.cleaned_data['first_name']}_{form.cleaned_data['last_name']}")
+#             if not check:
+#                 user = User.objects.create_user(first_name = form.cleaned_data['first_name'],
+#                                                 last_name = form.cleaned_data['last_name'],
+#                                                 username= f"{form.cleaned_data['first_name']}_{form.cleaned_data['last_name']}",
+#                                                 password = form.cleaned_data['password'],
+#                                                 )
+#                 print(user.password)
+#             else:
+#                 print(check[0].password)
            
 
-    form = UserLoginForm()
-    template = loader.get_template("cocktail/login.html")
-    return HttpResponse(template.render({"form": form}, request))
+#     form = UserLoginForm()
+#     template = loader.get_template("cocktail/login.html")
+#     return HttpResponse(template.render({"form": form}, request))
 
 def user_display(request, user_id):
     print("in user display -> ", user_id)
@@ -397,6 +438,11 @@ def cocktail_card (request, id, index=0):
         comments = CocktailFormComments(request.POST)
 
         comp = CompetitionStart.objects.filter(id=id).first()
+        print("Teams -> ",comp.cocktail_card.teams)
+        print(index)
+        print("taste score -> ", comp.cocktail_card.taste_score)
+        
+        
         index = comp.cocktail_card.current_index + 1
         comp.cocktail_card.current_index = index
         comp.cocktail_card.save()

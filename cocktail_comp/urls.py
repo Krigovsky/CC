@@ -12,7 +12,7 @@ urlpatterns = [
     #Registrations of team/admin
     path("registraition/", views.registraition, name='registraition'),
     path("teams/", views.teams, name="teams"),
-    path("login/", views.login, name="login"),
+    path("login/", views.user_login, name="login"),
     path("register/", views.user_registraition, name="register"),
     path("user_display/<int:user_id>", views.user_display, name="user_display"),
     path("start/", views.start_competition, name="start"),
