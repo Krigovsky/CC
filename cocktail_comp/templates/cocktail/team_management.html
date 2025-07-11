@@ -1,0 +1,13 @@
+{% extends "template.html" %}  
+{% block content %}
+<h1>Manage User</h1>
+
+{% for team in teams %}
+    <p>{{team.partner_names}}</p>
+{% endfor %}
+
+
+<a href="{% url 'cocktail:create_team' %}" class="btn btn-default">Create a team?</a>
+
+
+{% endblock %}

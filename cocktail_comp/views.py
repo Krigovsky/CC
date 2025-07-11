@@ -8,6 +8,7 @@ from django.forms import formset_factory
 from django.forms.models import model_to_dict
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 
 
 from .models import Couple, GolfGame, GolfCard, CompetitionStart, Cocktail
@@ -47,7 +48,7 @@ def index (request):
     context = {
         'form' : form
     }
-    print("Firtst here")
+
     return HttpResponse(template.render(context, request))
 
 def user_login(request):
@@ -77,6 +78,25 @@ def registraition (request):
     template = loader.get_template("cocktail/register.html")
     form = RegisterForm()
     context = { "form":form }
+    return HttpResponse(template.render(context, request))
+
+@login_required
+def user_management (request, id):
+
+    template = loader.get_template("cocktail/team_management.html")
+    teams = Couple.objects.filter().all()
+    context = {
+        "teams" : teams
+    }
+    return HttpResponse(template.render(context, request))
+
+def create_team (request):
+    template = loader.get_template("cocktail/create_team.html")
+    form = RegisterForm()
+
+    context = {
+        'form' : form 
+    }
     return HttpResponse(template.render(context, request))
 
 def view (request):

@@ -1,0 +1,19 @@
+{% extends "template.html" %}  
+{% block content %}
+<h1>Create Team</h1>
+
+<form action="{% url 'cocktail:create_team' %}" method="post">
+    {% csrf_token %}
+    {% for field in form %}
+        {{field.label_tag}}
+        {{field}}
+    {% endfor %}
+
+    
+
+
+
+    <input type="submit" value="Submit">
+</form>
+
+{% endblock %}

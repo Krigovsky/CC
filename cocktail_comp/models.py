@@ -1,8 +1,12 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.models import User as AUser
 
 
 class User (models.Model):
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
+    
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     password = models.CharField(max_length=50)
@@ -13,7 +17,7 @@ class Couple (models.Model):
          return self.team
     
     team = models.CharField(max_length=200, unique=True)
-    partner_names = models.CharField(max_length=200)
+    partner_names = models.ManyToManyField(AUser, related_name="teams")
     golf_results = models.CharField(max_length=200, null=True)
     cocktail_results = models.CharField(max_length=200, null=True)
     past_results = models.CharField(max_length=200, null=True)
