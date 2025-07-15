@@ -17,13 +17,23 @@ class RegisterForm (forms.Form):
         # self.fields['team_name'].widget.attrs['class'] = 'form-label'
     def get_users():
         users = [(x.id, f"{x.first_name} {x.last_name}") for x in AUser.objects.filter().all()]
-        print("Choices -> ", users)
+        # print("Choices -> ", users)
         return users
     
     team_name = forms.CharField(label="What is your Team Name", max_length=50)
-    partner_names = forms.MultipleChoiceField(label="Select people for your Team", 
+    partner_names = forms.MultipleChoiceField(widget=forms.SelectMultiple, label="Select people for your Team", 
                                               choices=get_users(),
-                                              widget=forms.CheckboxSelectMultiple())
+                                              )
+
+class JoinTeamForm (forms.Form):
+
+    def CHOICES():
+        choices = [(x.id, x.team) for x in Couple.objects.filter().all()]
+        print("Choices -> ",choices)
+        return choices
+
+    team = forms.ChoiceField(label="Which team do you want to join?", choices=CHOICES())
+
 
 class StartGolfGameForm (forms.Form):
     CHOICES = [
@@ -63,10 +73,6 @@ class UserRegistrationForm (forms.Form):
     first_name = forms.CharField(label="First Name", max_length=100)
     last_name = forms.CharField(label="Last Name", max_length=100)
     password = forms.CharField(label="Password", max_length=100)
-
-class JoinTeamForm (forms.Form):
-    name = forms.CharField(label="testing")
-
 
 class TeamUpdateForm (forms.Form):
     def CHOICES():

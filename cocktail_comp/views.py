@@ -15,7 +15,7 @@ from .models import Couple, GolfGame, GolfCard, CompetitionStart, Cocktail
 from .forms import (RegisterForm, StartGolfGameForm, UpdateScoreForm, 
                     UserLoginForm, TeamUpdateForm, StartCompetitionForm,
                     CocktailFormScore, CocktailFormComments, CocktailAddForm,
-                    UserRegistrationForm,
+                    UserRegistrationForm, JoinTeamForm,
 
                     )
 
@@ -90,9 +90,44 @@ def user_management (request, id):
     }
     return HttpResponse(template.render(context, request))
 
+@login_required
 def create_team (request):
+    if request.method == "POST":
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            print("partners chosen ->",form.cleaned_data['partner_names'], "Type -> ", type(form.cleaned_data['partner_names']))
+            print("team name -> ", form.cleaned_data['team_name'])
+            team = Couple.objects.create(team=form.cleaned_data['team_name'])
+
+            for id in form.cleaned_data['partner_names']:
+                team.partner_names.add(id)
+                team.save()
+            
+            print("Partners after adding and savign -> ", team.partner_names.all())
+
     template = loader.get_template("cocktail/create_team.html")
     form = RegisterForm()
+
+    context = {
+        'form' : form 
+    }
+    return HttpResponse(template.render(context, request))
+
+@login_required
+def join_team (request):
+    print("Current user -> ", request.user)
+    if request.method == "POST":
+        form = JoinTeamForm(request.POST)
+        if form.is_valid():
+            print("team name -> ", form.cleaned_data['team'])
+            team = Couple.objects.filter(id=form.cleaned_data['team']).first()
+            team.partner_names.add(request.user.id)
+            team.save()
+            print(team.partner_names.all())
+
+
+    template = loader.get_template("cocktail/join_team.html")
+    form = JoinTeamForm()
 
     context = {
         'form' : form 

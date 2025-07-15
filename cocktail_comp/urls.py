@@ -21,6 +21,7 @@ urlpatterns = [
     path("start/", views.start_competition, name="start"),
     path("user_management/<int:id>", views.user_management, name="user_management"),
     path("create_team/", views.create_team, name="create_team"),
+    path("join_team/", views.join_team, name="join_team"),
 
     #golfing portion
     # path("startGolf/", views.start_golf, name='start_golf' ), #deprecated
