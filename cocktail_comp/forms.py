@@ -1,6 +1,6 @@
 from django import forms
-from .models import Couple, User
-from django.contrib.auth.models import User as AUser
+from .models import Couple
+from django.contrib.auth.models import User 
 
 holes = (
             ("9", "Nine"),
@@ -16,7 +16,7 @@ class RegisterForm (forms.Form):
         self.fields['partner_names'].widget.attrs['class'] = 'form-control'
         # self.fields['team_name'].widget.attrs['class'] = 'form-label'
     def get_users():
-        users = [(x.id, f"{x.first_name} {x.last_name}") for x in AUser.objects.filter().all()]
+        users = [(x.id, f"{x.first_name} {x.last_name}") for x in User.objects.filter().all()]
         # print("Choices -> ", users)
         return users
     
@@ -24,6 +24,7 @@ class RegisterForm (forms.Form):
     partner_names = forms.MultipleChoiceField(widget=forms.SelectMultiple, label="Select people for your Team", 
                                               choices=get_users(),
                                               )
+    old_team = forms.CharField(widget=forms.HiddenInput(), max_length=200)
 
 class JoinTeamForm (forms.Form):
 

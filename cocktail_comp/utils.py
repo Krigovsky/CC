@@ -1,4 +1,5 @@
 from .models import GolfGame, GolfCard, Couple, CocktailCard, CompetitionStart
+from django.contrib.auth.models import User 
 
 from datetime import datetime
 import ast 
@@ -39,10 +40,16 @@ def start_new_game(form):
     names = []
     for team in teams:
         couple = Couple.objects.filter(team = team).first()
-        couple_names = ast.literal_eval(couple.partner_names)
-        # print(couple_names, type(couple_names))
+        print("Couples -> ")
+        couple_names = []
+        for x in couple.partner_names.all():
+            print(x.id)
+            user = User.objects.filter(id = x.id).first()
+            couple_names.append(f"{user.first_name} {user.last_name}")
+        #  ast.literal_eval(couple.partner_names)
+        print(couple_names, type(couple_names))
 
-        # inner_list = []
+        inner_list = []
         for name in couple_names:
             # print(name)
             names.append(name)
@@ -51,7 +58,7 @@ def start_new_game(form):
             else:
                 card_drivers.update({team: [False for i in range(int(form.cleaned_data["number_holes"]))]})
                 drivers.update({team : [{name: [False for i in range(int(form.cleaned_data["number_holes"]))]}]})
-        # names.append(inner_list)
+        names.append(inner_list)
     powers = {
         "mulligan" : [],
         "milligan" : []
@@ -91,10 +98,16 @@ def start_new_game(form):
 
 
 def get_team_members(team_name):
+    
     couple = Couple.objects.filter(team=team_name).first()
-    names = decode_name(couple.partner_names)
-    # print(f"Couples name -> {type(names)}")
-    return names
+    couple_names = []
+
+    for x in couple.partner_names.all():
+            print(x.id)
+            user = User.objects.filter(id = x.id).first()
+            couple_names.append(f"{user.first_name} {user.last_name}")
+
+    return couple_names
 
 def create_drive_count(drivers_dict, card_drivers_dict, current_hole, holes):
     # print("Drivers Drict ->",drivers_dict)

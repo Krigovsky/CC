@@ -8,13 +8,13 @@
 </form>
 
 {% if choosen_team %}
-    <form action="{% url 'cocktail:teams' %}" method="post">
-
+    <form action="{% url 'cocktail:teams' %}" name="update" method="post">
+        {% csrf_token %}
         <label for="team-name">Your current team name: {{choosen_team.team}}</label>
         <input type="text" name="team-name" id="team-name">
         </br> 
         
-        {% for person in choosen_team.partner_names %}
+        {% for person in partner_names %}
         
             <label for="team-members">Team Member 1: {{person}} : 
             </label>
@@ -24,10 +24,11 @@
                 {% endfor %}
             </select>
             </br>
-        {% endfor %}
 
+        {% endfor %}
+            {{choosen_team.old_team}}
         </br> </br> 
-        <input type="submit" name="update_teams" value="Submit">
+        <input type="submit" name="update" value="Submit">
     </form>
 
     <h5>If above details are correct use buttons to add your cocktail</h5>

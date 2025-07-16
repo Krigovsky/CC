@@ -3,13 +3,13 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import User as AUser
 
 
-class User (models.Model):
-    def __str__(self):
-        return f"{self.first_name} {self.last_name}"
+# class User (models.Model):
+#     def __str__(self):
+#         return f"{self.first_name} {self.last_name}"
     
-    first_name = models.CharField(max_length=50)
-    last_name = models.CharField(max_length=50)
-    password = models.CharField(max_length=50)
+#     first_name = models.CharField(max_length=50)
+#     last_name = models.CharField(max_length=50)
+#     password = models.CharField(max_length=50)
 
 class Couple (models.Model):
     

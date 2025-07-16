@@ -346,19 +346,37 @@ def teams(request):
         if chosen_team_form.is_valid():
             
             team = Couple.objects.filter(team=chosen_team_form.cleaned_data["team_name"]).first()
-            team.partner_names = ast.literal_eval(team.partner_names)
+            team_members = get_team_members(team)
+            print("team_members -> ", team_members)
 
             users = User.objects.filter().all()
 
-            teams_form = TeamUpdateForm() 
+            teams_form = TeamUpdateForm(initial={
+                "old_team" : team.team
+            }) 
+
             form = RegisterForm()
+
             context = { "form" : form,
                         "teams" : teams_form,
                         "choosen_team" : team,
+                        "partner_names" : team_members,
                         "users" : users
+
                         }
             return HttpResponse(template.render(context, request))
-    
+        
+    #TODO finish updating team for user and team name 
+    if 'update' in request.POST:
+        print("Update form submitted")
+        form = TeamUpdateForm(request.POST)
+        if form.is_valid():
+            print("Made it here")
+            print("Old team name -> ",form.cleaned_data['old_team'])
+        else:
+            # <--- THIS IS THE CRUCIAL PART FOR DEBUGGING!
+            print("Form is NOT valid!")
+            print(form.errors)
 
     teams_form = TeamUpdateForm() 
     form = RegisterForm()
@@ -426,30 +444,6 @@ def user_registraition(request):
     template = loader.get_template("cocktail/user-register.html")
     return HttpResponse(template.render({"form": form}, request))
 
-
-# def login(request):
-
-#     if request.method == "POST":
-#         print("form is recived")
-#         form = UserLoginForm(request.POST)
-#         if form.is_valid():
-#             print(form.cleaned_data['first_name'])
-#             check = User.objects.filter(username = f"{form.cleaned_data['first_name']}_{form.cleaned_data['last_name']}")
-#             if not check:
-#                 user = User.objects.create_user(first_name = form.cleaned_data['first_name'],
-#                                                 last_name = form.cleaned_data['last_name'],
-#                                                 username= f"{form.cleaned_data['first_name']}_{form.cleaned_data['last_name']}",
-#                                                 password = form.cleaned_data['password'],
-#                                                 )
-#                 print(user.password)
-#             else:
-#                 print(check[0].password)
-           
-
-#     form = UserLoginForm()
-#     template = loader.get_template("cocktail/login.html")
-#     return HttpResponse(template.render({"form": form}, request))
-
 def user_display(request, user_id):
     print("in user display -> ", user_id)
     user = User.objects.filter(id=user_id).first()
@@ -502,9 +496,6 @@ def cocktail_card (request, id, index=0):
         comp.cocktail_card.current_index = index
         comp.cocktail_card.save()
     
-
-        
-
     form = CocktailFormScore()
     comments = CocktailFormComments()
     descriptions = [
