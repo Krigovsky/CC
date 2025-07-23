@@ -231,25 +231,7 @@ def start_cocktail(form):
 
     print('Random order ->',random_order)
     
-    cocktail = CocktailCard.objects.create(teams = teams,
-                                           presentation_score = [0 for i in range(len(teams))],
-                                           presentation_comments = ['' for i in range(len(teams))],
-
-                                           taste_score = [0 for i in range(len(teams))],
-                                           taste_comments = ['' for i in range(len(teams))],
-
-                                           creativity_score = [0 for i in range(len(teams))],
-                                           creativity_comments = ['' for i in range(len(teams))],
-
-                                           theme_score = [0 for i in range(len(teams))],
-                                           theme_comments = ['' for i in range(len(teams))],
-
-                                           drinkability_score = [0 for i in range(len(teams))],
-                                           drinkability_comments = ['' for i in range(len(teams))],
-
-                                           total = [0 for i in range(len(teams))],
-                                           order = random_order
-                                           )
+    cocktail = CocktailCard.objects.create(order = random_order)
     return cocktail
 
 def start_compeition(form):
@@ -279,3 +261,15 @@ def create_cocktail_description(current_cocktail):
         "Garnish" : current_cocktail.garnish,
     }
     return temp
+
+def gather_total(form):
+    score = 0 
+    data = [
+        'presentation_score', 'taste_score', 'creativity_score',
+        'theme_score', 'theme_score'
+    ] 
+    for item in data:
+        score += form.cleaned_data[item]
+    
+    return score
+    

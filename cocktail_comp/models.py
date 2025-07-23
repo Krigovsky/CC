@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django.contrib.auth.models import User as AUser
+from django.contrib.auth.models import User as User
 
 
 # class User (models.Model):
@@ -17,7 +17,7 @@ class Couple (models.Model):
          return self.team
     
     team = models.CharField(max_length=200, unique=True)
-    partner_names = models.ManyToManyField(AUser, related_name="teams")
+    partner_names = models.ManyToManyField(User, related_name="teams")
     golf_results = models.CharField(max_length=200, null=True)
     cocktail_results = models.CharField(max_length=200, null=True)
     past_results = models.CharField(max_length=200, null=True)
@@ -33,6 +33,8 @@ class GolfGame (models.Model):
     location = models.CharField(max_length=200)
     number_holes = models.IntegerField()
     teams_playing = models.CharField(max_length=200)
+
+
 
 class GolfCard (models.Model):
 
@@ -68,7 +70,19 @@ class CocktailCard (models.Model):
     Teams: {self.teams}
     Order: {self.order}    
 """
+    order = models.CharField(max_length=500, null=True)
+    current_index = models.IntegerField(default=0)
+
+class CompetitionStart (models.Model):
+
+    date = models.DateField()
     teams = models.CharField(max_length=200)
+    golf_card = models.ForeignKey(GolfCard, on_delete=models.CASCADE, null=True)
+    cocktail_card = models.ForeignKey(CocktailCard, on_delete=models.CASCADE, null=True)
+
+class CocktailScores (models.Model):
+    comp = models.ForeignKey(CocktailCard, on_delete=models.CASCADE, null=True)
+    submission = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     presentation_score = models.CharField(max_length=500, null=True)
     presentation_comments = models.TextField(null=True)
     taste_score = models.CharField(max_length=500, null=True)
@@ -80,14 +94,7 @@ class CocktailCard (models.Model):
     drinkability_score = models.CharField(max_length=500, null=True)
     drinkability_comments = models.TextField(null=True)
     total = models.CharField(max_length=500, null=True)
-    order = models.CharField(max_length=500, null=True)
-    current_index = models.IntegerField(default=0)
-    cocktail_list = models.CharField(max_length=255, null=True)
-    
-class CompetitionStart (models.Model):
 
-    date = models.DateField()
-    teams = models.CharField(max_length=200)
-    golf_card = models.ForeignKey(GolfCard, on_delete=models.CASCADE, null=True)
-    cocktail_card = models.ForeignKey(CocktailCard, on_delete=models.CASCADE, null=True)
+    
+
 

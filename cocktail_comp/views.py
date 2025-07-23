@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 
 
-from .models import Couple, GolfGame, GolfCard, CompetitionStart, Cocktail
+from .models import Couple, GolfGame, GolfCard, CompetitionStart, Cocktail, CocktailCard, CocktailScores
 from .forms import (RegisterForm, StartGolfGameForm, UpdateScoreForm, 
                     UserLoginForm, TeamUpdateForm, StartCompetitionForm,
                     CocktailFormScore, CocktailFormComments, CocktailAddForm,
@@ -22,7 +22,7 @@ from .forms import (RegisterForm, StartGolfGameForm, UpdateScoreForm,
 from .utils import (split_names, decode_name, start_new_game, get_team_members, 
                     create_drive_count, get_power_texts, powers_update, 
                     check_previous_holes, create_hide_list, remove_duplicates,
-                    start_compeition, create_cocktail_description
+                    start_compeition, create_cocktail_description, gather_total
                     )
 
 import ast 
@@ -485,17 +485,32 @@ def cocktail_card (request, id, index=0):
         print("made it here")
         score = CocktailFormScore(request.POST)
         comments = CocktailFormComments(request.POST)
+        if score.is_valid() and comments.is_valid():
+            print("current User -> ", request.user.id)
+            total_score = gather_total(score)
+            insert_score = CocktailScores.objects.create(
+                presentation_score=score.cleaned_data['presentation_score'],
+                taste_score = score.cleaned_data['taste_score'],
+                creativity_score = score.cleaned_data['creativity_score'],
+                theme_score = score.cleaned_data['theme_score'],
+                drinkability_score = score.cleaned_data['drinkability_score'],
 
-        comp = CompetitionStart.objects.filter(id=id).first()
-        print("Teams -> ",comp.cocktail_card.teams)
-        print(index)
-        print("taste score -> ", comp.cocktail_card.taste_score)
-        
-        
-        index = comp.cocktail_card.current_index + 1
-        comp.cocktail_card.current_index = index
-        comp.cocktail_card.save()
-    
+                presentation_comments = comments.cleaned_data['presentation_comments'],
+                taste_comments = comments.cleaned_data['taste_comments'],
+                creativity_comments = comments.cleaned_data['creativity_comments'],
+                theme_comments = comments.cleaned_data['theme_comments'],
+                drinkability_comments = comments.cleaned_data['drinkability_comments'],
+
+                submission = request.user,
+                total = total_score
+            )
+            card = CompetitionStart.objects.filter(id=id).first()
+            card.cocktail_card.current_index += 1
+            card.cocktail_card.save()
+
+            return redirect('cocktail:cocktail_joining', id=id)
+
+
     form = CocktailFormScore()
     comments = CocktailFormComments()
     descriptions = [
@@ -548,4 +563,14 @@ def start_competition (request):
     }
     
     template = loader.get_template("cocktail/start.html")
+    return HttpResponse(template.render(context, request))
+
+def cocktail_joining (request, id):
+    print("in cocktial joining -> ", id)
+    card = CompetitionStart.objects.filter(id=id).first
+    print("")
+    template = loader.get_template("cocktail/cocktail_join.html")
+    context = {
+
+    }
     return HttpResponse(template.render(context, request))
