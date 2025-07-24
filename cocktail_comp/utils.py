@@ -1,4 +1,4 @@
-from .models import GolfGame, GolfCard, Couple, CocktailCard, CompetitionStart
+from .models import GolfGame, GolfCard, Couple, CocktailCard, CompetitionStart, CocktailScores
 from django.contrib.auth.models import User 
 
 from datetime import datetime
@@ -272,4 +272,17 @@ def gather_total(form):
         score += form.cleaned_data[item]
     
     return score
+
+def check_submissions_user(comp_id, user_id):
+    print("In check func")
+    results = CocktailScores.objects.filter(comp=comp_id, submission=user_id).all()
+    length = len(results)-1
+    for item in results:
+        print(item)
+    
+    return length
+
+def move_to_next_cocktail(comp_id):
+
+    pass
     

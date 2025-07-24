@@ -81,8 +81,11 @@ class CompetitionStart (models.Model):
     cocktail_card = models.ForeignKey(CocktailCard, on_delete=models.CASCADE, null=True)
 
 class CocktailScores (models.Model):
-    comp = models.ForeignKey(CocktailCard, on_delete=models.CASCADE, null=True)
+
+    comp = models.ForeignKey(CompetitionStart, on_delete=models.CASCADE, null=True)
     submission = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    index = models.CharField(max_length=255, null=True)
+
     presentation_score = models.CharField(max_length=500, null=True)
     presentation_comments = models.TextField(null=True)
     taste_score = models.CharField(max_length=500, null=True)

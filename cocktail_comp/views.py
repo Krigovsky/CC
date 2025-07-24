@@ -22,7 +22,8 @@ from .forms import (RegisterForm, StartGolfGameForm, UpdateScoreForm,
 from .utils import (split_names, decode_name, start_new_game, get_team_members, 
                     create_drive_count, get_power_texts, powers_update, 
                     check_previous_holes, create_hide_list, remove_duplicates,
-                    start_compeition, create_cocktail_description, gather_total
+                    start_compeition, create_cocktail_description, gather_total,
+                    check_submissions_user, move_to_next_cocktail
                     )
 
 import ast 
@@ -482,31 +483,41 @@ def cocktail_card (request, id, index=0):
     print("Made into cocktail -> ", id)
 
     if request.method == "POST":
+
         print("made it here")
         score = CocktailFormScore(request.POST)
         comments = CocktailFormComments(request.POST)
+        card = CompetitionStart.objects.filter(id=id).first()
+        index = card.cocktail_card.current_index
         if score.is_valid() and comments.is_valid():
             print("current User -> ", request.user.id)
             total_score = gather_total(score)
-            insert_score = CocktailScores.objects.create(
-                presentation_score=score.cleaned_data['presentation_score'],
-                taste_score = score.cleaned_data['taste_score'],
-                creativity_score = score.cleaned_data['creativity_score'],
-                theme_score = score.cleaned_data['theme_score'],
-                drinkability_score = score.cleaned_data['drinkability_score'],
+            if not CocktailScores.objects.filter(submission= request.user,
+                                            comp=CompetitionStart.objects.filter(id=id).first(),
+                                            index=index).first():
+                insert_score = CocktailScores.objects.create(
+                    presentation_score=score.cleaned_data['presentation_score'],
+                    taste_score = score.cleaned_data['taste_score'],
+                    creativity_score = score.cleaned_data['creativity_score'],
+                    theme_score = score.cleaned_data['theme_score'],
+                    drinkability_score = score.cleaned_data['drinkability_score'],
 
-                presentation_comments = comments.cleaned_data['presentation_comments'],
-                taste_comments = comments.cleaned_data['taste_comments'],
-                creativity_comments = comments.cleaned_data['creativity_comments'],
-                theme_comments = comments.cleaned_data['theme_comments'],
-                drinkability_comments = comments.cleaned_data['drinkability_comments'],
+                    presentation_comments = comments.cleaned_data['presentation_comments'],
+                    taste_comments = comments.cleaned_data['taste_comments'],
+                    creativity_comments = comments.cleaned_data['creativity_comments'],
+                    theme_comments = comments.cleaned_data['theme_comments'],
+                    drinkability_comments = comments.cleaned_data['drinkability_comments'],
 
-                submission = request.user,
-                total = total_score
-            )
-            card = CompetitionStart.objects.filter(id=id).first()
-            card.cocktail_card.current_index += 1
-            card.cocktail_card.save()
+                    submission = request.user,
+                    comp = CompetitionStart.objects.filter(id=id).first(),
+                    total = total_score, 
+                    index = index
+                )
+                # card = CompetitionStart.objects.filter(id=id).first()
+                # card.cocktail_card.current_index += 1
+                # card.cocktail_card.save()
+            else:
+                print("Already submitted a form for this round")
 
             return redirect('cocktail:cocktail_joining', id=id)
 
@@ -567,8 +578,24 @@ def start_competition (request):
 
 def cocktail_joining (request, id):
     print("in cocktial joining -> ", id)
-    card = CompetitionStart.objects.filter(id=id).first
-    print("")
+    card = CompetitionStart.objects.filter(id=id).first()
+    print("current user -> ", request.user)
+
+    # a check if current user gets to this page they have submitted enough to match the index, 
+    result = check_submissions_user(id,request.user.id)
+    move_next = move_to_next_cocktail(id)
+    print("Card current index -> ",card.cocktail_card.current_index)
+    print("Submission index from user -> ", result)
+
+    if result == card.cocktail_card.current_index:
+        print("In here")
+    # if not redirect to cocktail card
+
+    # else keep context to a waiting screen
+
+    # Once everyone has submitted move onto next index in comp
+ 
+    form_sub = CocktailScores.objects.filter(comp = id, submission = request.user.id)
     template = loader.get_template("cocktail/cocktail_join.html")
     context = {
 
