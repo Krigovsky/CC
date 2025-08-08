@@ -54,16 +54,20 @@ class UpdateScoreForm (forms.Form):
     score = forms.CharField(label="Score", required=True)
 
     driver = forms.ChoiceField(choices=[], required=True)
+    milligan_choice = forms.ChoiceField(choices=[], required=True)
 
     def __init__(self, *args, **kwargs):
         team_members = kwargs.pop('team_members', [])
+        print("Team members -> ",team_members)
         super().__init__(*args, **kwargs)
 
         self.fields['driver'].choices = [(member, member) for member in team_members]
+        self.fields['milligan_choice'].choices = [(member, member) for member in team_members]
 
     mulligan = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}))
     milligan = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}))
-    milligan_choice = forms.CharField(required=False, max_length=100)
+    
+
 
 class UserLoginForm (forms.Form):
     first_name = forms.CharField(label="First Name", max_length=100)

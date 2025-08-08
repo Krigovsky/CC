@@ -200,6 +200,7 @@ def update_score(request, id, hole):
     results_dict = ast.literal_eval(golf_card.results)
     card_drivers_dict = ast.literal_eval(golf_card.card_driver)
 
+    print("allowed drivers -> ", allowed_drivers)
 
     for i, form in enumerate(formset):
         available_choices = [(member, member) for member in team_members[i] if member in allowed_drivers]
