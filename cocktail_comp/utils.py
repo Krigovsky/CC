@@ -281,8 +281,14 @@ def check_submissions_user(comp_id, user_id):
         print(item)
     
     return length
-
+"Check if all users apart of comp have submitted a cocktail form for the current index"
+"if so then increase index"
 def move_to_next_cocktail(comp_id):
-
+    comp = CompetitionStart.objects.filter(id=comp_id).first()
+    teams = ast.literal_eval(comp.teams)
+    print("\n\nMove to teams ->",teams, type(teams))
+    index = comp.cocktail_card.current_index
+    print("Index ->", index)
+    print("Team id in order -> ",ast.literal_eval(comp.cocktail_card.order)[index])
     pass
     

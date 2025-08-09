@@ -157,12 +157,6 @@ def view (request):
         couple_name = decode_name(couple.partner_names)
     return render(request, "cocktail/view.html", { "couples" : couples})
 
-# def start_golf (request):
-#     print("on start of golf page")
-#     template = loader.get_template("cocktail/start_golf.html")
-#     form = StartGolfGameForm()
-#     context = { "form" : form }
-#     return HttpResponse(template.render(context, request))
 
 def golf_card (request):
     print("Creating the card")
@@ -328,7 +322,6 @@ def score_card (request, id, hole):
                                          "milligans" : milligans,
                                          "comp_id" : comp.id
                                          }, request))
-
 
 def go_to_n_hole(request,id, hole):
     print("Going to specfic hole -> ", hole)
@@ -584,7 +577,9 @@ def cocktail_joining (request, id):
 
     # a check if current user gets to this page they have submitted enough to match the index, 
     result = check_submissions_user(id,request.user.id)
+    
     move_next = move_to_next_cocktail(id)
+
     print("Card current index -> ",card.cocktail_card.current_index)
     print("Submission index from user -> ", result)
 

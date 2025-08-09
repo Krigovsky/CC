@@ -30,7 +30,6 @@ class JoinTeamForm (forms.Form):
 
     def CHOICES():
         choices = [(x.id, x.team) for x in Couple.objects.filter().all()]
-        print("Choices -> ",choices)
         return choices
 
     team = forms.ChoiceField(label="Which team do you want to join?", choices=CHOICES())
@@ -54,18 +53,16 @@ class UpdateScoreForm (forms.Form):
     score = forms.CharField(label="Score", required=True)
 
     driver = forms.ChoiceField(choices=[], required=True)
-    milligan_choice = forms.ChoiceField(choices=[], required=True)
 
     def __init__(self, *args, **kwargs):
         team_members = kwargs.pop('team_members', [])
-        print("Team members -> ",team_members)
         super().__init__(*args, **kwargs)
 
         self.fields['driver'].choices = [(member, member) for member in team_members]
-        self.fields['milligan_choice'].choices = [(member, member) for member in team_members]
 
     mulligan = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}))
     milligan = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}))
+    milligan_choice = forms.CharField(label="", required=False)
     
 
 
@@ -83,10 +80,6 @@ class TeamUpdateForm (forms.Form):
     def CHOICES():
         teams = Couple.objects.filter().all()
         choices = [(team.team, team.team) for i,team in enumerate(teams)]
-        print(choices)
-        # for item in teams:
-        #     choices.append((f"{item}", f"{item}"))
-        #     print(item)
         return choices
 
     team_name = forms.ChoiceField(label="What team are you looking to join/make adjustments for?",
