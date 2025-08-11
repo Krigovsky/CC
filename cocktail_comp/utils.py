@@ -97,15 +97,20 @@ def start_new_game(form):
     return game_card
 
 
-def get_team_members(team_name):
-    
+def get_team_members(team_name, id=False):
     couple = Couple.objects.filter(team=team_name).first()
     couple_names = []
 
-    for x in couple.partner_names.all():
-            print(x.id)
-            user = User.objects.filter(id = x.id).first()
+    if not id:
+        for user in couple.partner_names.all():
+            print(user.id)
+            user = User.objects.filter(id = user.id).first()
             couple_names.append(f"{user.first_name} {user.last_name}")
+    else:
+        for user in couple.partner_names.all():
+            print(user.id)
+            user = User.objects.filter(id = user.id).first()
+            couple_names.append(user.id)
 
     return couple_names
 
@@ -281,14 +286,32 @@ def check_submissions_user(comp_id, user_id):
         print(item)
     
     return length
+
+
 "Check if all users apart of comp have submitted a cocktail form for the current index"
 "if so then increase index"
-def move_to_next_cocktail(comp_id):
+def move_to_next_cocktail(comp_id, index):
     comp = CompetitionStart.objects.filter(id=comp_id).first()
     teams = ast.literal_eval(comp.teams)
-    print("\n\nMove to teams ->",teams, type(teams))
+    # print("\n\nMove to teams ->",teams, type(teams))
     index = comp.cocktail_card.current_index
-    print("Index ->", index)
-    print("Team id in order -> ",ast.literal_eval(comp.cocktail_card.order)[index])
+    # print("Index ->", index)
+    teams.pop(index)
+    # print("Teams after poping current index -> ", teams)
+    players = []
+    for team in teams:
+        players.extend(get_team_members(team, id=True))
+
+    is_completed = True
+    # Check if each player not in the presenting team has submitted a score sheet for the
+    # current cocktail/index. if there is one missing can not progress to the next cocktail
+    while is_completed:
+        for user in players:
+            form_completed = CocktailScores.objects.filter(submission=user, comp_id=comp_id, index=index)
+            if not form_completed:
+                is_completed = False
+                return False
+            
+        return True
     pass
     

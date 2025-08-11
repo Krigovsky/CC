@@ -573,27 +573,49 @@ def start_competition (request):
 def cocktail_joining (request, id):
     print("in cocktial joining -> ", id)
     card = CompetitionStart.objects.filter(id=id).first()
-    print("current user -> ", request.user)
+    print("current user -> ", request.user.id)
+    print("")
 
     # a check if current user gets to this page they have submitted enough to match the index, 
-    result = check_submissions_user(id,request.user.id)
+    # result = check_submissions_user(id,request.user.id)
     
-    move_next = move_to_next_cocktail(id)
+    every_form_completed = move_to_next_cocktail(id, index=card.cocktail_card.current_index)
+    if every_form_completed:
+        print("before update index -> ", card.cocktail_card.current_index)
+        card.cocktail_card.current_index += 1
+        card.cocktail_card.save()
+        print("updated index -> ", card.cocktail_card.current_index)
 
-    print("Card current index -> ",card.cocktail_card.current_index)
-    print("Submission index from user -> ", result)
+    
 
-    if result == card.cocktail_card.current_index:
-        print("In here")
+    print("Is every form completed -> ", every_form_completed)
+
+    check = CocktailScores.objects.filter(submission=request.user.id, comp_id=id).all()
+    print(check)
+    print("length of check -> ", len(check))
+    
+    if len(check) == card.cocktail_card.current_index:
+        print("Can move onto next cocktail")
+        template = loader.get_template("cocktail/cocktail_join.html")
+        context = {
+            "move_on" : True,
+            "comp_id" : id
+        }
+        return HttpResponse(template.render(context, request))
+
+    # print("Card current index -> ",card.cocktail_card.current_index)
+    # print("Submission index from user -> ", result)
+
+    # if result == card.cocktail_card.current_index:
+    #     print("In here")
     # if not redirect to cocktail card
 
     # else keep context to a waiting screen
 
     # Once everyone has submitted move onto next index in comp
  
-    form_sub = CocktailScores.objects.filter(comp = id, submission = request.user.id)
     template = loader.get_template("cocktail/cocktail_join.html")
     context = {
-
+        "move_on" : False
     }
     return HttpResponse(template.render(context, request))

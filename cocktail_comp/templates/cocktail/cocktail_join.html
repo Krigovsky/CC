@@ -2,6 +2,9 @@
 {% block content %}
 <h1>Cockatil Joining</h1>
 
+{% if move_on %}
+        <a href="{% url 'cocktail:cocktail' id=comp_id %}" class="btn btn-default">Onto Next Cocktail</a> 
+{% endif %}
 
 
 {% endblock %}
