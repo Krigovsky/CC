@@ -28,5 +28,8 @@ class Test_Models (TestCase):
         self.assertEqual(self.user1.username, "John_Smith")
 
     def test_couple(self):
+        pass
+
+class Test_Utils()
 
 
