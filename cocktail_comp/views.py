@@ -135,28 +135,6 @@ def join_team (request):
     }
     return HttpResponse(template.render(context, request))
 
-def view (request):
-    if request.method == "POST":
-        print("IN THE IF STATEMENT")
-        form = RegisterForm(request.POST)
-        
-        if form.is_valid():
-            print("Name from form -> ", form.cleaned_data["team_name"])
-            # print("Partner names -> ", form.cleaned_data["partner_names"], type(form.cleaned_data["partner_names"]))
-            names = split_names(form.cleaned_data["partner_names"])
-            cpl_session = Couple.objects.create(team=form.cleaned_data["team_name"], partner_names=names)
-
-            return redirect('cocktail:cocktail_add', id=cpl_session.id)
-            
-
-    couples = get_list_or_404(Couple)
-    print("Couple -> ", couples, type(couples))
-    print("Name -> ", couples[0].team)
-    for couple in couples:
-        # print(couple.team, '-> ', couple.partner_names, '-> ', type(couple.partner_names))
-        couple_name = decode_name(couple.partner_names)
-    return render(request, "cocktail/view.html", { "couples" : couples})
-
 
 def golf_card (request):
     print("Creating the card")
@@ -177,8 +155,7 @@ def update_score(request, id, hole):
     # print(f"TEST WORKED | ID = {id} | Hole = {hole}" )
     #Grab the golf card based of the id passed through in the url
     golf_card = GolfCard.objects.filter(id=id).first()
-    
-    teams = decode_name(golf_card.card.teams_playing)
+    teams = ast.literal_eval(golf_card.card.teams_playing)
     #create dynamic form to get the score for the hole
     card_form_set = formset_factory(UpdateScoreForm, extra=golf_card.team_count)
     formset = card_form_set(request.POST or None)

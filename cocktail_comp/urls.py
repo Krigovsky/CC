@@ -9,7 +9,7 @@ app_name = "cocktail"
 urlpatterns = [
     #basics
     path("", views.index, name='index'),
-    path("view/", views.view, name='view'),
+    # path("view/", views.view, name='view'),
     path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout'),
 
     #Registrations of team/admin

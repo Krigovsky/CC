@@ -5,17 +5,17 @@ from datetime import datetime
 import ast 
 import random
 
+# TODO Reduent, replace with the single line
 def split_names(names):
     name = names.split(', ')
     return name
-
+# TODO redunent
 def decode_name(name_string):
     names = name_string.split(", ")
     final = []
 
     for x in names:
         final.append(x.strip("''[]"))
-
 
     return final
 
