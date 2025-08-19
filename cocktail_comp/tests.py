@@ -1,8 +1,10 @@
 from django.test import TestCase
 import unittest
+from datetime import datetime
+from django.utils import timezone
 
 from django.contrib.auth.models import User
-from .models import Couple
+from .models import Couple, GolfGame, GolfCard
 
 # Create your tests here.
 class Test_Models (TestCase):
@@ -22,6 +24,21 @@ class Test_Models (TestCase):
             team = "Team 1"
         )
 
+        self.golf_game = GolfGame.objects.create(
+            date = timezone.now(),
+            game_type = "Normal",
+            location = "Normal",
+            number_holes = "9",
+            teams_playing = self.couple1
+        )
+
+        self.game_card = GolfCard.objects.create(
+            card = self.golf_game,
+            results = {},
+            team_count = 1,
+            score = [0,0,0,0,0,0,0,0,0]
+        )
+
     
 
     def test_user (self):
@@ -37,12 +54,20 @@ class Test_Models (TestCase):
         self.couple1.partner_names.add(self.user1)
         self.couple1.partner_names.add(self.user2)
         self.couple1.save()
-        print("testing -> ", self.couple1.partner_names.first() )
         self.assertTrue(isinstance(self.couple1.partner_names.first(), User))
         
 
     def test_golfGame(self):
-        pass
+        
+        self.assertEqual(self.golf_game.game_type, "Normal")
+        self.assertEqual(self.golf_game.location, "Normal")
+        self.assertTrue(isinstance(self.golf_game, GolfGame))
+    
+    def test_gameCard(self):
+        self.assertTrue(isinstance(self.game_card.card, GolfGame))
+
+
+    
         
 
 # class Test_Utils(unittest.TestCase):

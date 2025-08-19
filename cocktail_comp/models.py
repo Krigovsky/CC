@@ -22,7 +22,7 @@ class Couple (models.Model):
     cocktail_results = models.CharField(max_length=200, null=True)
     past_results = models.CharField(max_length=200, null=True)
 
-#TODO Reduent model
+
 class GolfGame (models.Model):
     def __str__(self):
         return self.id
